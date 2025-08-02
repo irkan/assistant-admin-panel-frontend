@@ -1,0 +1,280 @@
+---
+alwaysApply: false
+---
+Cursor AI Rules for React Admin Panel Frontend with Refine.dev
+These rules outline the best practices and guidelines for using Cursor AI to develop a React-based admin panel frontend with the Refine.dev component library, TypeScript, and a focus on clean code principles. The frontend will interact with the Node.js REST API backend described in the previous project guidelines.
+Project Overview
+
+Frontend Framework: React (latest stable version, e.g., 18.x as of August 2025)
+Component Library: Refine.dev (latest stable version)
+Language: TypeScript (latest stable version)
+Goal: Build a scalable, maintainable, and user-friendly admin panel frontend that integrates seamlessly with the Node.js REST API backend, adhering to clean code principles.
+
+General Guidelines
+
+Code Quality:
+
+Write clean, modular, and maintainable code following React and TypeScript best practices.
+Use consistent code formatting with Prettier (latest version).
+Enforce strict TypeScript linting with ESLint (use @typescript-eslint plugin, latest version) and a style guide (e.g., Airbnb TypeScript).
+Add concise, meaningful comments to explain component logic, hooks, and complex UI flows.
+Follow the DRY (Don't Repeat Yourself) principle and use reusable components.
+
+
+Versioning:
+
+Use the latest stable version of React (e.g., 18.x) and Refine.dev.
+Ensure all dependencies (e.g., React Router, Axios, etc.) use the latest stable versions compatible with React.
+Regularly update dependencies to patch security vulnerabilities using npm audit or yarn audit.
+
+
+Clean Code Principles:
+
+Keep components small and focused, with a single responsibility.
+Use meaningful names for components, variables, and functions (e.g., UserList instead of List).
+Avoid deeply nested component trees; prefer composition over inheritance.
+Use TypeScript interfaces/types for props, state, and API responses to ensure type safety.
+
+
+Security:
+
+Store sensitive data (e.g., API tokens) securely in environment variables using VITE_ prefix (e.g., VITE_API_URL) with Vite (latest version).
+Sanitize user inputs to prevent XSS attacks using libraries like sanitize-html (latest version) if needed.
+Use HTTPS for API requests to the backend.
+Implement role-based access control (RBAC) in the frontend based on user roles from the backend.
+
+
+
+Frontend Development
+
+Framework Setup:
+
+Use Refine.dev as the primary framework for building the admin panel, leveraging its built-in features for data management, routing, and UI components.
+Set up the project with Vite (latest version) for fast development and optimized builds.
+Use TypeScript for all source code (*.tsx for components, *.ts for utilities).
+Example project setup:npm create refine-app@latest -- --template react-vite-typescript
+
+
+
+
+Project Structure:
+
+Organize the codebase into a modular structure:/src
+  /components        # Reusable UI components
+  /pages             # Page components (e.g., UserList, Dashboard)
+  /hooks             # Custom React hooks
+  /types             # TypeScript interfaces and types
+  /services          # API service functions (e.g., Axios calls)
+  /utils             # Utility functions
+  /styles            # Global styles and Tailwind CSS config
+  /routes            # Refine.dev route configurations
+
+
+Use Refine.dev’s conventions for resources, data providers, and auth providers.
+
+
+Refine.dev Integration:
+
+Configure Refine.dev with a data provider to connect to the Node.js REST API (e.g., @refinedev/simple-rest).
+Use Refine.dev’s built-in components (e.g., <List>, <Table>, <Form>) for rapid development.
+Implement authentication using Refine.dev’s auth provider, integrating with the backend’s JWT-based authentication.
+Example Refine setup:import { Refine } from '@refinedev/core';
+import { ThemedLayoutV2 } from '@refinedev/mui';
+import dataProvider from '@refinedev/simple-rest';
+import routerProvider from '@refinedev/react-router-v6';
+import { BrowserRouter } from 'react-router-dom';
+
+const App: React.FC = () => (
+  <BrowserRouter>
+    <Refine
+      dataProvider={dataProvider('http://localhost:3000/api/v1')}
+      routerProvider={routerProvider}
+      resources={[
+        {
+          name: 'users',
+          list: '/users',
+          show: '/users/show/:id',
+          create: '/users/create',
+          edit: '/users/edit/:id',
+        },
+      ]}
+    >
+      <ThemedLayoutV2>{/* App content */}</ThemedLayoutV2>
+    </Refine>
+  </BrowserRouter>
+);
+
+
+
+
+Styling:
+
+Use Tailwind CSS (latest version) for styling, integrated with Refine.dev’s Material-UI components (if using @refinedev/mui).
+Prefer utility-first CSS with Tailwind to reduce custom CSS.
+Keep global styles minimal and store them in /src/styles/global.css.
+Ensure responsive design for mobile and desktop views.
+
+
+State Management:
+
+Use Refine.dev’s built-in data management for most CRUD operations.
+For complex state, use React’s useState and useReducer for local state, and useQuery/useMutation from Refine.dev for API interactions.
+Avoid external state libraries (e.g., Redux) unless absolutely necessary for complex state management.
+
+
+API Integration:
+
+Use Axios (latest version) or Refine.dev’s data provider for API calls to the Node.js backend.
+Define TypeScript interfaces for API responses in /src/types.
+Example API service:// src/services/api.ts
+import axios from 'axios';
+
+export interface User {
+  id: number;
+  email: string;
+  role: string;
+  created_at: string;
+}
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+});
+
+export const getUsers = async (): Promise<User[]> => {
+  const response = await api.get('/users');
+  return response.data.data;
+};
+
+
+
+
+Routing:
+
+Use Refine.dev’s router provider (e.g., @refinedev/react-router-v6) for navigation.
+Define routes as resources in Refine.dev’s configuration.
+Protect routes based on user roles (e.g., admin-only pages).
+
+
+
+TypeScript Guidelines
+
+Type Safety:
+
+Use TypeScript for all components, hooks, and services.
+Define interfaces for props, API responses, and state objects.
+Avoid using any type; prefer specific types or unknown with type guards.
+Example component with TypeScript:// src/pages/UserList.tsx
+import { List, Table, useTable } from '@refinedev/mui';
+import { User } from '../types';
+
+interface UserListProps {
+  title?: string;
+}
+
+const UserList: React.FC<UserListProps> = ({ title = 'Users' }) => {
+  const { tableProps } = useTable<User>();
+  return (
+    <List title={title}>
+      <Table {...tableProps}>
+        <Table.Column dataIndex="id" title="ID" />
+        <Table.Column dataIndex="email" title="Email" />
+        <Table.Column dataIndex="role" title="Role" />
+      </Table>
+    </List>
+  );
+};
+
+export default UserList;
+
+
+
+
+Type Checking:
+
+Configure tsconfig.json with strict mode (strict: true).
+Use ESLint with @typescript-eslint to catch type-related errors.
+
+
+
+Testing
+
+Unit Tests:
+
+Use Jest (latest version) with Testing Library (@testing-library/react) for testing components and hooks.
+Test component rendering, user interactions, and API integrations.
+Aim for at least 80% test coverage.
+
+
+Integration Tests:
+
+Test Refine.dev resources and navigation flows.
+Mock API responses using MSW (Mock Service Worker, latest version) for testing.
+
+
+Test Setup:
+
+Configure a test environment with VITE_NODE_ENV=test.
+Use vitest (latest version) for fast testing with Vite.
+
+
+
+Development Workflow
+
+Version Control:
+
+Use Git with a clear branching strategy (e.g., Gitflow or trunk-based development).
+Write meaningful commit messages (e.g., feat: add user list page with Refine.dev).
+
+
+Code Reviews:
+
+Use Cursor AI to generate component boilerplate and suggest optimizations, but manually review all AI-generated code for accuracy and adherence to TypeScript types.
+Ensure AI-generated code follows clean code principles and project style guides.
+
+
+CI/CD:
+
+Set up a CI/CD pipeline using GitHub Actions or GitLab CI.
+Run linting, type checking, and tests on every push/pull request.
+
+
+
+Additional Tools and Libraries
+
+HTTP Client: Axios (latest version) for API requests.
+Form Handling: Use Refine.dev’s form components or React Hook Form (latest version) for complex forms.
+Icons: Use @mui/icons-material (latest version) for consistent icons with Refine.dev’s Material-UI integration.
+Error Tracking: Integrate Sentry (latest version) for frontend error monitoring.
+Documentation: Use JSDoc for code documentation and Storybook (latest version) for component documentation.
+
+Cursor AI-Specific Rules
+
+Code Generation:
+
+Use Cursor AI to generate Refine.dev components, TypeScript interfaces, and API service functions.
+Prompt Cursor AI with specific instructions (e.g., "Generate a TypeScript React component for a user list page using Refine.dev’s Table component").
+Ensure AI-generated code includes TypeScript types and adheres to clean code principles.
+
+
+Refactoring:
+
+Use Cursor AI to suggest refactoring for large components or to improve type safety.
+Verify that refactored code maintains functionality and passes tests.
+
+
+Debugging:
+
+Leverage Cursor AI to identify potential bugs in component rendering or API integration.
+Cross-check AI suggestions with manual debugging using React Developer Tools or VS Code.
+
+
+
+Example Code Snippet
+Below is an example of a Refine.dev page component for listing users with TypeScript:
+
+
+// src/pages/UserList.tsximport React from 'react';import { List, Table, useTable } from '@refinedev/mui';import { TableColumn } from '@refinedev/mui';import { User } from '../types';
+// Define props interfaceinterface UserListProps {  title?: string;}
+// User list page componentconst UserList: React.FC = ({ title = 'Users' }) => {  const { tableProps } = useTable({    resource: 'users',  });
+  return (          <Table {...tableProps}>                                    );};
+export default UserList;

@@ -1,0 +1,237 @@
+import { DataProvider } from "@refinedev/core";
+
+const API_BASE_URL = "http://localhost:3003";
+
+const getAuthHeader = () => {
+  const token = localStorage.getItem("refine-auth");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+export const dataProvider: DataProvider = {
+  getList: async ({ resource, pagination, filters, sorters }) => {
+    const { current = 1, pageSize = 50 } = pagination ?? {};
+    const offset = (current - 1) * pageSize;
+    
+    let url = `${API_BASE_URL}/api/${resource}?limit=${pageSize}&offset=${offset}`;
+    
+    // Add filters
+    if (filters) {
+      filters.forEach((filter) => {
+        if (filter.value !== undefined && filter.value !== null) {
+          url += `&${filter.field}=${filter.value}`;
+        }
+      });
+    }
+
+    const response = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    return {
+      data: data.data || [],
+      total: data.pagination?.total || 0,
+    };
+  },
+
+  getOne: async ({ resource, id }) => {
+    const response = await fetch(`${API_BASE_URL}/api/${resource}/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    return {
+      data: data.data,
+    };
+  },
+
+  create: async ({ resource, variables }) => {
+    const response = await fetch(`${API_BASE_URL}/api/${resource}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify(variables),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Create failed");
+    }
+
+    const data = await response.json();
+
+    return {
+      data: data.data,
+    };
+  },
+
+  update: async ({ resource, id, variables }) => {
+    const response = await fetch(`${API_BASE_URL}/api/${resource}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify(variables),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Update failed");
+    }
+
+    const data = await response.json();
+
+    return {
+      data: data.data,
+    };
+  },
+
+  deleteOne: async ({ resource, id }) => {
+    const response = await fetch(`${API_BASE_URL}/api/${resource}/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Delete failed");
+    }
+
+    return {
+      data: {},
+    };
+  },
+
+  getMany: async ({ resource, ids }) => {
+    const promises = ids.map((id) =>
+      fetch(`${API_BASE_URL}/api/${resource}/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+      }).then((res) => res.json())
+    );
+
+    const responses = await Promise.all(promises);
+    const data = responses.map((response) => response.data);
+
+    return {
+      data,
+    };
+  },
+
+  createMany: async ({ resource, variables }) => {
+    const promises = variables.map((variable) =>
+      fetch(`${API_BASE_URL}/api/${resource}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify(variable),
+      }).then((res) => res.json())
+    );
+
+    const responses = await Promise.all(promises);
+    const data = responses.map((response) => response.data);
+
+    return {
+      data,
+    };
+  },
+
+  updateMany: async ({ resource, ids, variables }) => {
+    const promises = ids.map((id) =>
+      fetch(`${API_BASE_URL}/api/${resource}/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify(variables),
+      }).then((res) => res.json())
+    );
+
+    const responses = await Promise.all(promises);
+    const data = responses.map((response) => response.data);
+
+    return {
+      data,
+    };
+  },
+
+  deleteMany: async ({ resource, ids }) => {
+    const promises = ids.map((id) =>
+      fetch(`${API_BASE_URL}/api/${resource}/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+      })
+    );
+
+    await Promise.all(promises);
+
+    return {
+      data: {},
+    };
+  },
+
+  custom: async ({ url, method, filters, sorters, payload, query, headers }) => {
+    let requestUrl = `${API_BASE_URL}${url}`;
+
+    if (query) {
+      const searchParams = new URLSearchParams();
+      Object.entries(query).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.append(key, value.toString());
+        }
+      });
+      requestUrl += `?${searchParams.toString()}`;
+    }
+
+    const response = await fetch(requestUrl, {
+      method: method || "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+        ...headers,
+      },
+      body: payload ? JSON.stringify(payload) : undefined,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Request failed");
+    }
+
+    const data = await response.json();
+
+    return {
+      data: data.data || data,
+    };
+  },
+}; 
