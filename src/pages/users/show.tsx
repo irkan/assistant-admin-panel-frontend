@@ -2,10 +2,8 @@ import React from "react";
 import { Show } from "@refinedev/mui";
 import { useShow } from "@refinedev/core";
 import {
-  Box,
   Typography,
   Stack,
-  Chip,
 } from "@mui/material";
 import { BooleanField } from "@refinedev/mui";
 
