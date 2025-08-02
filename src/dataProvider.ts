@@ -1,6 +1,6 @@
 import { DataProvider } from "@refinedev/core";
 
-const API_BASE_URL = "http://localhost:3003";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3003";
 
 const getAuthHeader = (): Record<string, string> => {
   const token = localStorage.getItem("refine-auth");
