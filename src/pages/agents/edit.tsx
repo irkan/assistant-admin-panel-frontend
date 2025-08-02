@@ -122,9 +122,8 @@ export const AgentEdit: React.FC = () => {
           name="details.interactionMode"
           select
         >
-          <MenuItem value="chat">Chat</MenuItem>
-          <MenuItem value="voice">Voice</MenuItem>
-          <MenuItem value="text">Text</MenuItem>
+          <MenuItem value="agent_speak_first">Agent Speaks First</MenuItem>
+          <MenuItem value="user_speak_first">User Speaks First</MenuItem>
         </TextField>
         <FormControlLabel
           control={
