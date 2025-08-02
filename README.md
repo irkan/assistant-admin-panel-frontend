@@ -1,214 +1,213 @@
-# Admin Panel
+# Admin Panel - Full Stack Production Deployment
 
-A comprehensive admin panel built with Refine and React for managing users, organizations, and agents. This application integrates with a backend API to provide full CRUD operations.
+Complete production deployment setup for the admin panel with React frontend and Node.js backend.
 
-## Features
+## 🏗️ Architecture
 
-### 🔐 Authentication
-- JWT-based authentication
-- Secure login/logout functionality
-- Token management and validation
-- Protected routes
+- **Frontend**: React + Vite + Refine (Port 3000)
+- **Backend**: Node.js + Express + Prisma + PostgreSQL (Port 3003)
+- **Database**: External PostgreSQL (recommended) or Docker PostgreSQL
 
-### 👥 User Management
-- List all users with pagination and filtering
-- Create new users with validation
-- Edit existing user information
-- View user details
-- Delete users
-- Active/inactive status management
-
-### 🏢 Organization Management
-- List all organizations with pagination and filtering
-- Create new organizations
-- Edit organization details
-- View organization information
-- Delete organizations
-- Hierarchical organization structure support
-- Active/inactive status management
-
-### 🤖 Agent Management
-- List all agents with pagination and filtering
-- Create new agents with detailed configuration
-- Edit agent settings and details
-- View comprehensive agent information
-- Delete agents
-- Agent interaction mode configuration (chat, voice, text)
-- System prompt and first message configuration
-- Organization association
-
-### 📊 Dashboard
-- Overview of system statistics
-- Quick access to main features
-- Visual representation of data
-- Quick action buttons
-
-## Technology Stack
-
-- **Frontend**: React 18, TypeScript
-- **UI Framework**: Material-UI (MUI)
-- **Admin Framework**: Refine
-- **Routing**: React Router
-- **State Management**: React Query (via Refine)
-- **Authentication**: JWT tokens
-- **Data Grid**: MUI Data Grid
-- **Forms**: React Hook Form
-
-## Backend API Integration
-
-The admin panel integrates with a RESTful API with the following endpoints:
-
-### Authentication
-- `POST /api/auth/login` - User authentication
-
-### Users
-- `GET /api/users` - List users with pagination and filtering
-- `GET /api/users/:id` - Get user by ID
-- `POST /api/users` - Create new user
-- `PUT /api/users/:id` - Update user
-- `DELETE /api/users/:id` - Delete user
-
-### Organizations
-- `GET /api/organizations` - List organizations with pagination and filtering
-- `GET /api/organizations/:id` - Get organization by ID
-- `POST /api/organizations` - Create new organization
-- `PUT /api/organizations/:id` - Update organization
-- `DELETE /api/organizations/:id` - Delete organization
-
-### Agents
-- `GET /api/agents` - List agents with pagination and filtering
-- `GET /api/agents/:id` - Get agent by ID
-- `POST /api/agents` - Create new agent
-- `PUT /api/agents/:id` - Update agent
-- `DELETE /api/agents/:id` - Delete agent
-
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
-- npm or yarn
-- Backend API running on `http://localhost:3003`
+- Linux VM with Docker and Docker Compose installed
+- Git access to your repository
 
-### Installation
+### One-Command Deployment
 
-1. Clone the repository:
 ```bash
-git clone <repository-url>
+# Clone the repository
+git clone <your-repo-url>
+cd your-project
+
+# Make scripts executable
+chmod +x deploy-full-stack.sh
+chmod +x admin-panel-backend/deploy.sh
+chmod +x admin-panel-backend/setup-env.sh
+chmod +x admin-panel/deploy.sh
+
+# Deploy everything
+./deploy-full-stack.sh
+```
+
+## 📁 Project Structure
+
+```
+your-project/
+├── admin-panel-backend/          # Backend API
+│   ├── docker-compose.prod.yml   # Backend Docker Compose
+│   ├── Dockerfile.prod           # Backend Dockerfile
+│   ├── deploy.sh                 # Backend deployment script
+│   ├── setup-env.sh              # Backend environment setup
+│   └── .env.production           # Backend environment variables
+├── admin-panel/                  # Frontend React App
+│   ├── docker-compose.prod.yml   # Frontend Docker Compose
+│   ├── Dockerfile.prod           # Frontend Dockerfile
+│   ├── nginx.conf                # Nginx configuration
+│   ├── deploy.sh                 # Frontend deployment script
+│   └── .env.production           # Frontend environment variables
+└── deploy-full-stack.sh          # Combined deployment script
+```
+
+## 🔧 Individual Deployments
+
+### Backend Only
+
+```bash
+cd admin-panel-backend
+./setup-env.sh    # Generate environment file
+./deploy.sh       # Deploy backend
+```
+
+### Frontend Only
+
+```bash
 cd admin-panel
+# Edit .env.production with your backend URL
+./deploy.sh       # Deploy frontend
 ```
 
-2. Install dependencies:
+## 🌐 Access Points
+
+After deployment:
+
+- **Frontend**: http://your-server-ip:3000
+- **Backend API**: http://your-server-ip:3003
+- **Backend Health**: http://your-server-ip:3003/health
+- **Frontend Health**: http://your-server-ip:3000/health
+
+## ⚙️ Configuration
+
+### Backend Environment (.env.production)
+
 ```bash
-npm install
+# Database connection
+DATABASE_URL="postgresql://username:password@your-database-host:5432/admin_panel"
+
+# JWT configuration
+JWT_SECRET=your-super-secure-jwt-secret
 ```
 
-3. Start the development server:
+### Frontend Environment (.env.production)
+
 ```bash
-npm run dev
+# Backend API URL
+VITE_API_URL=http://your-backend-ip:3003
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+## 🛠️ Management Commands
 
-### Environment Configuration
+### View Logs
 
-The application is configured to connect to the backend API at `http://localhost:3003`. If your backend is running on a different URL, update the `API_BASE_URL` constant in the following files:
+```bash
+# Backend logs
+docker compose -f admin-panel-backend/docker-compose.prod.yml logs -f
 
-- `src/authProvider.ts`
-- `src/dataProvider.ts`
-
-## Usage
-
-### Login
-1. Navigate to the login page
-2. Enter your email and password
-3. Click "Sign In" to authenticate
-
-### Managing Users
-1. Navigate to "Users" from the sidebar
-2. View the list of all users
-3. Use the "Create User" button to add new users
-4. Click on user rows to view details, edit, or delete
-
-### Managing Organizations
-1. Navigate to "Organizations" from the sidebar
-2. View the list of all organizations
-3. Use the "Create Organization" button to add new organizations
-4. Click on organization rows to view details, edit, or delete
-
-### Managing Agents
-1. Navigate to "Agents" from the sidebar
-2. View the list of all agents
-3. Use the "Create Agent" button to add new agents
-4. Configure agent details including interaction mode, system prompts, and first messages
-5. Click on agent rows to view details, edit, or delete
-
-## Features
-
-### Data Grid Features
-- Server-side pagination
-- Column sorting
-- Row selection
-- Bulk actions
-- Export functionality
-- Responsive design
-
-### Form Validation
-- Required field validation
-- Email format validation
-- Password strength requirements
-- Custom validation rules
-
-### Error Handling
-- Network error handling
-- API error messages
-- User-friendly error displays
-- Automatic token refresh
-
-### Security
-- JWT token authentication
-- Secure token storage
-- Automatic token validation
-- Protected routes
-
-## Development
-
-### Project Structure
-```
-src/
-├── components/          # Reusable components
-├── contexts/           # React contexts
-├── pages/             # Page components
-│   ├── users/         # User management pages
-│   ├── organizations/ # Organization management pages
-│   ├── agents/        # Agent management pages
-│   └── dashboard/     # Dashboard page
-├── authProvider.ts    # Authentication provider
-├── dataProvider.ts    # Data provider for API integration
-└── App.tsx           # Main application component
+# Frontend logs
+docker compose -f admin-panel/docker-compose.prod.yml logs -f
 ```
 
-### Adding New Features
+### Restart Services
 
-1. **New Resource**: Add a new resource to the `resources` array in `App.tsx`
-2. **New Pages**: Create new page components in the appropriate directory
-3. **API Integration**: Update the data provider to handle new endpoints
-4. **Authentication**: Update the auth provider if needed
+```bash
+# Restart backend
+docker compose -f admin-panel-backend/docker-compose.prod.yml restart
 
-### Customization
+# Restart frontend
+docker compose -f admin-panel/docker-compose.prod.yml restart
+```
 
-- **Theme**: Modify the Material-UI theme in `contexts/color-mode`
-- **Layout**: Customize the layout in `components/header` and `ThemedLayoutV2`
-- **Styling**: Update component styles using MUI's `sx` prop or styled components
+### Update Application
 
-## Contributing
+```bash
+# Update everything
+git pull
+./deploy-full-stack.sh
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+# Or update individually
+cd admin-panel-backend && ./deploy.sh
+cd ../admin-panel && ./deploy.sh
+```
 
-## License
+## 🔒 Security Considerations
 
-This project is licensed under the MIT License.
+1. **Environment Files**: Never commit `.env.production` files
+2. **HTTPS**: Use reverse proxy (nginx) with SSL certificates
+3. **Firewall**: Configure firewall to allow only necessary ports
+4. **Database**: Use external database for production
+5. **Secrets**: Rotate JWT secrets regularly
+
+## 🗄️ Database Setup
+
+### Option 1: External Database (Recommended)
+
+```bash
+# Update DATABASE_URL in admin-panel-backend/.env.production
+DATABASE_URL="postgresql://username:password@your-db-server:5432/admin_panel"
+```
+
+### Option 2: Docker Database
+
+```bash
+# Add to admin-panel-backend/docker-compose.prod.yml
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: admin_panel
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+```
+
+## 📊 Monitoring
+
+### Health Checks
+
+```bash
+# Test backend health
+curl http://your-server-ip:3003/health
+
+# Test frontend health
+curl http://your-server-ip:3000/health
+```
+
+### Database Backup
+
+```bash
+# If using external database
+pg_dump "postgresql://username:password@your-db-server:5432/admin_panel" > backup.sql
+
+# If using Docker database
+docker exec admin-panel-postgres pg_dump -U postgres admin_panel > backup.sql
+```
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+1. **Port conflicts**: Change ports in docker-compose files
+2. **Database connection**: Check DATABASE_URL and network connectivity
+3. **Frontend can't reach backend**: Update VITE_API_URL
+4. **Permission errors**: Make scripts executable with `chmod +x`
+
+### Logs
+
+```bash
+# Check backend logs
+docker compose -f admin-panel-backend/docker-compose.prod.yml logs backend
+
+# Check frontend logs
+docker compose -f admin-panel/docker-compose.prod.yml logs frontend
+```
+
+## 📚 Additional Resources
+
+- [Backend Production Guide](admin-panel-backend/PRODUCTION.md)
+- [Frontend Production Guide](admin-panel/PRODUCTION.md)
+- [API Documentation](admin-panel-backend/API_DOCUMENTATION.md)
