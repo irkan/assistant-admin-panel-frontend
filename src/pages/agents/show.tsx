@@ -5,7 +5,6 @@ import {
   Typography,
   Stack,
   Paper,
-  Box,
 } from "@mui/material";
 import { BooleanField } from "@refinedev/mui";
 

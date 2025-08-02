@@ -47,7 +47,7 @@ export const OrganizationList: React.FC = () => {
       field: "parentId",
       headerName: "Parent ID",
       width: 100,
-      valueGetter: (params) => params?.value || "None",
+      valueGetter: (params: any) => params?.value || "None",
     },
     {
       field: "active",

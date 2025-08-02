@@ -4,9 +4,15 @@ import { useForm } from "@refinedev/react-hook-form";
 import { useList } from "@refinedev/core";
 import { Box, TextField, FormControlLabel, Switch, MenuItem } from "@mui/material";
 
+interface Organization {
+  id: number;
+  name: string;
+  shortName?: string;
+}
+
 export const AgentCreate: React.FC = () => {
   const { saveButtonProps, register, formState: { errors }, setValue, watch } = useForm();
-  const [organizations, setOrganizations] = useState([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch organizations for the select dropdown
@@ -24,7 +30,7 @@ export const AgentCreate: React.FC = () => {
 
   useEffect(() => {
     if (organizationsData?.data) {
-      setOrganizations(organizationsData.data);
+      setOrganizations(organizationsData.data as Organization[]);
       setLoading(false);
     }
   }, [organizationsData]);
@@ -76,8 +82,8 @@ export const AgentCreate: React.FC = () => {
         </TextField>
         <TextField
           {...register("details.firstMessage")}
-          error={!!errors?.details?.firstMessage}
-          helperText={errors?.details?.firstMessage?.message as string}
+          error={!!(errors?.details as any)?.firstMessage}
+          helperText={(errors?.details as any)?.firstMessage?.message as string}
           margin="normal"
           fullWidth
           label="First Message"
@@ -87,8 +93,8 @@ export const AgentCreate: React.FC = () => {
         />
         <TextField
           {...register("details.systemPrompt")}
-          error={!!errors?.details?.systemPrompt}
-          helperText={errors?.details?.systemPrompt?.message as string}
+          error={!!(errors?.details as any)?.systemPrompt}
+          helperText={(errors?.details as any)?.systemPrompt?.message as string}
           margin="normal"
           fullWidth
           label="System Prompt"
@@ -98,8 +104,8 @@ export const AgentCreate: React.FC = () => {
         />
         <TextField
           {...register("details.interactionMode")}
-          error={!!errors?.details?.interactionMode}
-          helperText={errors?.details?.interactionMode?.message as string}
+          error={!!(errors?.details as any)?.interactionMode}
+          helperText={(errors?.details as any)?.interactionMode?.message as string}
           margin="normal"
           fullWidth
           label="Interaction Mode"

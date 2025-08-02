@@ -2,26 +2,18 @@ import { DataProvider } from "@refinedev/core";
 
 const API_BASE_URL = "http://localhost:3003";
 
-const getAuthHeader = () => {
+const getAuthHeader = (): Record<string, string> => {
   const token = localStorage.getItem("refine-auth");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 export const dataProvider: DataProvider = {
-  getList: async ({ resource, pagination, filters, sorters }) => {
+  getApiUrl: () => API_BASE_URL,
+  getList: async ({ resource, pagination }) => {
     const { current = 1, pageSize = 50 } = pagination ?? {};
     const offset = (current - 1) * pageSize;
     
-    let url = `${API_BASE_URL}/api/${resource}?limit=${pageSize}&offset=${offset}`;
-    
-    // Add filters
-    if (filters) {
-      filters.forEach((filter) => {
-        if (filter.value !== undefined && filter.value !== null) {
-          url += `&${filter.field}=${filter.value}`;
-        }
-      });
-    }
+    const url = `${API_BASE_URL}/api/${resource}?limit=${pageSize}&offset=${offset}`;
 
     const response = await fetch(url, {
       headers: {
@@ -120,7 +112,7 @@ export const dataProvider: DataProvider = {
     }
 
     return {
-      data: {},
+      data: {} as any,
     };
   },
 
@@ -196,11 +188,11 @@ export const dataProvider: DataProvider = {
     await Promise.all(promises);
 
     return {
-      data: {},
+      data: [] as any,
     };
   },
 
-  custom: async ({ url, method, filters, sorters, payload, query, headers }) => {
+  custom: async ({ url, method, payload, query, headers }) => {
     let requestUrl = `${API_BASE_URL}${url}`;
 
     if (query) {

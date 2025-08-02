@@ -41,8 +41,8 @@ export const AgentList: React.FC = () => {
       field: "organization",
       headerName: "Organization",
       width: 150,
-      valueGetter: (params:any) => {
-        const organization = params;
+      valueGetter: (params) => {
+        const organization = params as any;
         if (organization && organization.name) {
           return organization.shortName 
             ? `${organization.name} (${organization.shortName})`

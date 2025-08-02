@@ -9,7 +9,6 @@ import {
   Paper,
 } from "@mui/material";
 import {
-  People,
   Business,
   SmartToy,
   Dashboard as DashboardIcon,
