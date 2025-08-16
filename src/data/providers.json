@@ -1,0 +1,127 @@
+{
+  "providers": [
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "models": [
+        {
+          "id": "gpt-4o-2024-11-20",
+          "name": "GPT-4o 2024-11-20",
+          "description": "Latest GPT-4o model"
+        },
+        {
+          "id": "gpt-4o-2024-08-06",
+          "name": "GPT-4o 2024-08-06",
+          "description": "Previous GPT-4o model"
+        },
+        {
+          "id": "gpt-4o-mini",
+          "name": "GPT-4o-mini",
+          "description": "Lightweight GPT-4o model"
+        },
+        {
+          "id": "gpt-3.5-turbo",
+          "name": "GPT-3.5-turbo",
+          "description": "GPT-3.5 Turbo model"
+        }
+      ]
+    },
+    {
+      "id": "azure-openai",
+      "name": "Azure OpenAI",
+      "models": [
+        {
+          "id": "gpt-4o-2024-11-20",
+          "name": "GPT 4o Cluster",
+          "description": "Azure GPT-4o deployment"
+        },
+        {
+          "id": "gpt-4o-2024-08-06",
+          "name": "GPT-4o 2024-08-06",
+          "description": "Azure GPT-4o August model"
+        },
+        {
+          "id": "gpt-4o-mini",
+          "name": "GPT-4o-mini",
+          "description": "Azure GPT-4o mini model"
+        }
+      ]
+    },
+    {
+      "id": "anthropic",
+      "name": "Anthropic",
+      "models": [
+        {
+          "id": "claude-3.5-sonnet",
+          "name": "Claude 3.5 Sonnet",
+          "description": "Latest Claude model"
+        },
+        {
+          "id": "claude-3-opus",
+          "name": "Claude 3 Opus",
+          "description": "Claude 3 Opus model"
+        }
+      ]
+    },
+    {
+      "id": "google",
+      "name": "Google",
+      "models": [
+        {
+          "id": "gemini-2.5-flash-preview-native-audio",
+          "name": "Gemini 2.5 Flash Preview Native Audio",
+          "description": "gemini-2.5-flash-preview-native-audio-dialog",
+          "isNew": true
+        },
+        {
+          "id": "gemini-2.5-flash-exp-native-audio",
+          "name": "Gemini 2.5 Flash Exp Native Audio",
+          "description": "gemini-2.5-flash-exp-native-audio-thinking-dialog",
+          "isNew": true
+        },
+        {
+          "id": "gemini-2.5-flash-live-preview",
+          "name": "Gemini 2.5 Flash Live Preview",
+          "description": "gemini-2.5-flash-live-preview"
+        },
+        {
+          "id": "gemini-2.0-flash-001",
+          "name": "Gemini 2.0 Flash 001",
+          "description": "gemini-2.0-flash-live-001"
+        }
+      ],
+      "voices": [
+        {"id": "zephyr", "name": "Zephyr", "description": "Bright, Higher pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Zephyr.wav"},
+        {"id": "puck", "name": "Puck", "description": "Upbeat, Middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Puck.wav"},
+        {"id": "charon", "name": "Charon", "description": "Informative, Lower pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Charon.wav"},
+        {"id": "kore", "name": "Kore", "description": "Firm, Middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Kore.wav"},
+        {"id": "fenrir", "name": "Fenrir", "description": "Excitable, Lower middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Fenrir.wav"},
+        {"id": "leda", "name": "Leda", "description": "Youthful, Higher pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Leda.wav"},
+        {"id": "orus", "name": "Orus", "description": "Firm, Lower middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Orus.wav"},
+        {"id": "aoede", "name": "Aoede", "description": "Breezy, Middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Aoede.wav"},
+        {"id": "callirrhoe", "name": "Callirrhoe", "description": "Easy-going, Middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Callirrhoe.wav"},
+        {"id": "autonoe", "name": "Autonoe", "description": "Bright, Middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Autonoe.wav"},
+        {"id": "enceladus", "name": "Enceladus", "description": "Breathy, Lower pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Enceladus.wav"},
+        {"id": "iapetus", "name": "Iapetus", "description": "Clear, Lower middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Iapetus.wav"},
+        {"id": "umbriel", "name": "Umbriel", "description": "Easy-going, Lower middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Umbriel.wav"},
+        {"id": "algieba", "name": "Algieba", "description": "Smooth, Lower pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Algieba.wav"},
+        {"id": "despina", "name": "Despina", "description": "Smooth, Middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Despina.wav"},
+        {"id": "erinome", "name": "Erinome", "description": "Clear, Middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Erinome.wav"},
+        {"id": "algenib", "name": "Algenib", "description": "Gravelly, Lower pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Algenib.wav"},
+        {"id": "rasalgethi", "name": "Rasalgethi", "description": "Informative, Middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Rasalgethi.wav"},
+        {"id": "laomedeia", "name": "Laomedeia", "description": "Upbeat, Higher pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Laomedeia.wav"},
+        {"id": "achernar", "name": "Achernar", "description": "Soft, Higher pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Achernar.wav"},
+        {"id": "alnilam", "name": "Alnilam", "description": "Firm, Lower middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Alnilam.wav"},
+        {"id": "schedar", "name": "Schedar", "description": "Even, Lower middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Schedar.wav"},
+        {"id": "gacrux", "name": "Gacrux", "description": "Mature, Middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Gacrux.wav"},
+        {"id": "pulcherrima", "name": "Pulcherrima", "description": "Forward, Middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Pulcherrima.wav"},
+        {"id": "achird", "name": "Achird", "description": "Friendly, Lower middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Achird.wav"},
+        {"id": "zubenelgenubi", "name": "Zubenelgenubi", "description": "Casual, Lower middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Zubenelgenubi.wav"},
+        {"id": "vindemiatrix", "name": "Vindemiatrix", "description": "Gentle, Middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Vindemiatrix.wav"},
+        {"id": "sadachbia", "name": "Sadachbia", "description": "Lively, Lower pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Sadachbia.wav"},
+        {"id": "sadaltager", "name": "Sadaltager", "description": "Knowledgeable, Middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Sadaltager.wav"},
+        {"id": "sulafat", "name": "Sulafat", "description": "Warm, Middle pitch", "sampleUrl": "https://gstatic.com/aistudio/voices/samples/Sulafat.wav"}
+      ]
+    }
+  ]
+}

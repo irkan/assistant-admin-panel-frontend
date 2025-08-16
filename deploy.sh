@@ -18,7 +18,7 @@ if [ ! -f ".env.production" ]; then
     cat > .env.production << EOF
 # Frontend Environment Variables
 NODE_ENV=production
-VITE_API_URL=http://localhost:3004
+VITE_API_URL=http://46.62.135.5:3003
 EOF
 fi
 

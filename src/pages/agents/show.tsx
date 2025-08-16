@@ -29,7 +29,10 @@ export const AgentShow: React.FC = () => {
               <strong>Name:</strong> {record?.name}
             </Typography>
             <Typography variant="body1">
-              <strong>Organization ID:</strong> {record?.organizationId}
+              <strong>Organization:</strong> {record?.organization?.name || `ID: ${record?.organizationId}`}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Voice Model:</strong> {record?.voiceModel || "Not specified"}
             </Typography>
             <Typography variant="body1">
               <strong>Active:</strong> <BooleanField value={record?.active} />

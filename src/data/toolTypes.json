@@ -1,0 +1,110 @@
+{
+  "categories": {
+    "core": {
+      "name": "Core Tools",
+      "tools": [
+        {
+          "id": "custom_tool",
+          "name": "Custom Tool",
+          "description": "Create custom functionality with code",
+          "backgroundColor": "#F59E0B",
+          "textColor": "#FFFFFF",
+          "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" fill=\"currentColor\" viewBox=\"0 0 256 256\" class=\"h-6 w-6\"><path d=\"M212,40a12,12,0,0,1-12,12H170.71A20,20,0,0,0,151,68.42L142.38,116H184a12,12,0,0,1,0,24H138l-9.44,51.87A44,44,0,0,1,85.29,228H56a12,12,0,0,1,0-24H85.29A20,20,0,0,0,105,187.58L113.62,140H72a12,12,0,0,1,0-24h46l9.44-51.87A44,44,0,0,1,170.71,28H200A12,12,0,0,1,212,40Z\"></path></svg>"
+        },
+        {
+          "id": "dtmf_tool",
+          "name": "DTMF",
+          "description": "Send dual-tone multi-frequency signals",
+          "backgroundColor": "#F59E0B",
+          "textColor": "#FFFFFF",
+          "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" fill=\"currentColor\" viewBox=\"0 0 256 256\" class=\"h-6 w-6\"><path d=\"M208,28H48A20,20,0,0,0,28,48V208a20,20,0,0,0,20,20H208a20,20,0,0,0,20-20V48A20,20,0,0,0,208,28Zm-4,176H52V52H204Zm-96-61.36a39.81,39.81,0,0,0,14.94,5L109.7,169.85a12,12,0,1,0,20.6,12.3L162.64,128A40,40,0,1,0,108,142.64ZM114.14,100a16,16,0,0,1,27.72,16l0,0a16,16,0,0,1-27.7-16Z\"></path></svg>"
+        },
+        {
+          "id": "query_tool",
+          "name": "Query",
+          "description": "Search and query data sources",
+          "backgroundColor": "#3B82F6",
+          "textColor": "#FFFFFF",
+          "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" fill=\"currentColor\" viewBox=\"0 0 256 256\" class=\"h-6 w-6\"><path d=\"M232.49,215.51,185,168a92.12,92.12,0,1,0-17,17l47.53,47.54a12,12,0,0,0,17-17ZM44,112a68,68,0,1,1,68,68A68.07,68.07,0,0,1,44,112Z\"></path></svg>"
+        },
+        {
+          "id": "end_call_tool",
+          "name": "End Call",
+          "description": "Terminate the current call",
+          "backgroundColor": "#EF4444",
+          "textColor": "#FFFFFF",
+          "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" fill=\"currentColor\" viewBox=\"0 0 256 256\" class=\"h-6 w-6\"><path d=\"M236.28,177.85a16,16,0,0,1-18.38,5.07l-24.76-19a3.43,3.43,0,0,1-.53-.48L109.18,71.62a4,4,0,0,1,2.55-6.68c43-4.62,87.74,9.12,119.86,41.24h0C251.58,126.17,253.51,155.64,236.28,177.85ZM53.93,34.62A8,8,0,1,0,42.09,45.38L69.71,75.77a142,142,0,0,0-45.3,30.41c-20,20-21.92,49.46-4.69,71.67a16,16,0,0,0,18.38,5.07l49-17.37.29-.11a16,16,0,0,0,9.75-11.72l5.9-29.51a73.64,73.64,0,0,1,8.57-2.39l90.5,99.56a8,8,0,1,0,11.84-10.76Z\"></path></svg>"
+        },
+        {
+          "id": "transfer_call_tool",
+          "name": "Transfer Call",
+          "description": "Transfer the call to another number",
+          "backgroundColor": "#10B981",
+          "textColor": "#FFFFFF",
+          "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" fill=\"currentColor\" viewBox=\"0 0 256 256\" class=\"h-6 w-6\"><path d=\"M136,72a8,8,0,0,1,8-8h52.69L178.34,45.66a8,8,0,0,1,11.32-11.32l32,32a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32-11.32L196.69,80H144A8,8,0,0,1,136,72Zm78.36,94.46-47.11-21.11-.11-.06a16,16,0,0,0-15.18,1.4,8.12,8.12,0,0,0-.75.56L126.87,168c-15.42-7.49-31.34-23.29-38.83-38.51l20.78-24.71c.2-.25.39-.5.57-.77a16,16,0,0,0,1.32-15.06l0-.12L89.54,41.64a16,16,0,0,0-16.62-9.51A56.24,56.24,0,0,0,24,88c0,79.4,64.6,144,144,144a56.24,56.24,0,0,0,55.87-48.92A16,16,0,0,0,214.36,166.46Z\"></path></svg>"
+        },
+        {
+          "id": "send_text_tool",
+          "name": "Send Text",
+          "description": "Send SMS or text messages",
+          "backgroundColor": "#14B8A6",
+          "textColor": "#FFFFFF",
+          "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" fill=\"currentColor\" viewBox=\"0 0 256 256\" class=\"h-6 w-6\"><path d=\"M216,44H40A20,20,0,0,0,20,64V224A19.82,19.82,0,0,0,31.56,242.1a20.14,20.14,0,0,0,8.49,1.9,19.91,19.91,0,0,0,12.82-4.72l.12-.11L84.47,212H216a20,20,0,0,0,20-20V64A20,20,0,0,0,216,44Zm-4,144H80a11.93,11.93,0,0,0-7.84,2.92L44,215.23V68H212ZM84,108A12,12,0,0,1,96,96h64a12,12,0,1,1,0,24H96A12,12,0,0,1,84,108Zm0,40a12,12,0,0,1,12-12h64a12,12,0,1,1,0,24H96A12,12,0,0,1,84,148Z\"></path></svg>"
+        },
+        {
+          "id": "api_request_tool",
+          "name": "API Request",
+          "description": "Make HTTP API requests",
+          "backgroundColor": "#3B82F6",
+          "textColor": "#FFFFFF",
+          "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" fill=\"currentColor\" viewBox=\"0 0 256 256\" class=\"h-6 w-6\"><path d=\"M149.66,149.66,131.31,168l18.35,18.34a8,8,0,0,1-11.32,11.32L132,191.31l-23.31,23.32a32.06,32.06,0,0,1-45.26,0l-5.37-5.38-28.4,28.41a8,8,0,0,1-11.32-11.32l28.41-28.4-5.38-5.37a32,32,0,0,1,0-45.26L64.69,124l-6.35-6.34a8,8,0,0,1,11.32-11.32L88,124.69l18.34-18.35a8,8,0,0,1,11.32,11.32L99.31,136,120,156.69l18.34-18.35a8,8,0,0,1,11.32,11.32Zm88-131.32a8,8,0,0,0-11.32,0l-28.4,28.41-5.37-5.38a32.05,32.05,0,0,0-45.26,0L124,64.69l-6.34-6.35a8,8,0,0,0-11.32,11.32l80,80a8,8,0,0,0,11.32-11.32L191.31,132l23.32-23.31a32,32,0,0,0,0-45.26l-5.38-5.37,28.41-28.4A8,8,0,0,0,237.66,18.34Z\"></path></svg>"
+        }
+      ]
+    },
+    "integrations": {
+      "name": "Integrations",
+      "tools": [
+        {
+          "id": "mcp_tool",
+          "name": "MCP",
+          "description": "Model Context Protocol integration",
+          "backgroundColor": "#F43F5E",
+          "textColor": "#FFFFFF",
+          "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" fill=\"currentColor\" viewBox=\"0 0 256 256\" class=\"h-6 w-6\"><path d=\"M212.48,136.49l-82.06,82a60,60,0,0,1-84.85-84.88l98.16-97.89a40,40,0,0,1,56.56,56.59l-.17.16-95.8,92.22a12,12,0,1,1-16.64-17.3l95.71-92.12a16,16,0,0,0-22.7-22.56L62.53,150.57a36,36,0,0,0,50.93,50.91l82.06-82a12,12,0,0,1,17,17Z\"></path></svg>"
+        },
+        {
+          "id": "slack_tool",
+          "name": "Slack",
+          "description": "Send messages to Slack channels",
+          "backgroundColor": "#4A154B",
+          "textColor": "#FFFFFF",
+          "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" fill=\"currentColor\" viewBox=\"0 0 256 256\" class=\"h-6 w-6\"><path d=\"M224,84H180.2l7.61-41.85a12,12,0,0,0-23.62-4.3L155.8,84H116.2l7.61-41.85a12,12,0,1,0-23.62-4.3L91.8,84H48a12,12,0,0,0,0,24H87.44l-7.27,40H32a12,12,0,0,0,0,24H75.8l-7.61,41.85a12,12,0,0,0,9.66,14A11.43,11.43,0,0,0,80,228a12,12,0,0,0,11.8-9.86L100.2,172h39.6l-7.61,41.85a12,12,0,0,0,9.66,14,11.43,11.43,0,0,0,2.16.2,12,12,0,0,0,11.8-9.86L164.2,172H208a12,12,0,0,0,0-24H168.56l7.27-40H224a12,12,0,0,0,0-24Zm-79.83,64H104.56l7.27-40h39.61Z\"></path></svg>"
+        },
+        {
+          "id": "google_sheets_tool",
+          "name": "Google Sheets",
+          "description": "Read and write to Google Sheets",
+          "backgroundColor": "#10B981",
+          "textColor": "#FFFFFF",
+          "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" fill=\"currentColor\" viewBox=\"0 0 256 256\" class=\"h-6 w-6\"><path d=\"M224,44H32A12,12,0,0,0,20,56V192a20,20,0,0,0,20,20H216a20,20,0,0,0,20-20V56A12,12,0,0,0,224,44ZM44,116H76v24H44Zm56,0H212v24H100ZM212,68V92H44V68ZM44,164H76v24H44Zm56,24V164H212v24Z\"></path></svg>"
+        },
+        {
+          "id": "google_calendar_tool",
+          "name": "Google Calendar",
+          "description": "Manage calendar events",
+          "backgroundColor": "#3B82F6",
+          "textColor": "#FFFFFF",
+          "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" fill=\"currentColor\" viewBox=\"0 0 256 256\" class=\"h-6 w-6\"><path d=\"M208,28H188V24a12,12,0,0,0-24,0v4H92V24a12,12,0,0,0-24,0v4H48A20,20,0,0,0,28,48V208a20,20,0,0,0,20,20H208a20,20,0,0,0,20-20V48A20,20,0,0,0,208,28ZM68,52a12,12,0,0,0,24,0h72a12,12,0,0,0,24,0h16V76H52V52ZM52,204V100H204V204Zm60-80v56a12,12,0,0,1-24,0V143.32a12,12,0,0,1-9.37-22l16-8A12,12,0,0,1,112,124Zm61.49,33.88L163.9,168H168a12,12,0,0,1,0,24H136a12,12,0,0,1-8.71-20.25L155.45,142a4,4,0,0,0,.55-2,4,4,0,0,0-7.47-2,12,12,0,0,1-20.78-12A28,28,0,0,1,180,140a27.77,27.77,0,0,1-5.64,16.86A10.63,10.63,0,0,1,173.49,157.88Z\"></path></svg>"
+        },
+        {
+          "id": "gohighlevel_tool",
+          "name": "GoHighLevel",
+          "description": "CRM and marketing automation",
+          "backgroundColor": "#F59E0B",
+          "textColor": "#FFFFFF",
+          "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" fill=\"currentColor\" viewBox=\"0 0 256 256\" class=\"h-6 w-6\"><path d=\"M208,28H188V24a12,12,0,0,0-24,0v4H92V24a12,12,0,0,0-24,0v4H48A20,20,0,0,0,28,48V208a20,20,0,0,0,20,20H208a20,20,0,0,0,20-20V48A20,20,0,0,0,208,28ZM68,52a12,12,0,0,0,24,0h72a12,12,0,0,0,24,0h16V76H52V52ZM52,204V100H204V204Zm112-52a12,12,0,0,1-12,12H140v12a12,12,0,0,1-24,0V164H104a12,12,0,0,1,0-24h12V128a12,12,0,0,1,24,0v12h12A12,12,0,0,1,164,152Z\"></path></svg>"
+        }
+      ]
+    }
+  }
+}

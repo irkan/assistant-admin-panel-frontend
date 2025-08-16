@@ -125,6 +125,25 @@ export const AgentEdit: React.FC = () => {
           <MenuItem value="agent_speak_first">Agent Speaks First</MenuItem>
           <MenuItem value="user_speak_first">User Speaks First</MenuItem>
         </TextField>
+        <TextField
+          {...register("voiceModel")}
+          error={!!errors?.voiceModel}
+          helperText={errors?.voiceModel?.message as string}
+          margin="normal"
+          fullWidth
+          label="Voice Model"
+          name="voiceModel"
+          select
+        >
+          <MenuItem value="GPT-4o 2024-11-20">GPT-4o 2024-11-20</MenuItem>
+          <MenuItem value="GPT-4o 2024-08-06">GPT-4o 2024-08-06</MenuItem>
+          <MenuItem value="GPT-4o-mini">GPT-4o-mini</MenuItem>
+          <MenuItem value="GPT-3.5-turbo">GPT-3.5-turbo</MenuItem>
+          <MenuItem value="Claude 3.5 Sonnet">Claude 3.5 Sonnet</MenuItem>
+          <MenuItem value="Claude 3 Opus">Claude 3 Opus</MenuItem>
+          <MenuItem value="Gemini 1.5 Pro">Gemini 1.5 Pro</MenuItem>
+          <MenuItem value="Gemini 1.5 Flash">Gemini 1.5 Flash</MenuItem>
+        </TextField>
         <FormControlLabel
           control={
             <Switch

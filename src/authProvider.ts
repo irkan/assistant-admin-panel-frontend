@@ -3,7 +3,7 @@ import type { AuthProvider } from "@refinedev/core";
 export const TOKEN_KEY = "refine-auth";
 export const USER_KEY = "refine-user";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3003";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://46.62.135.5:3003";
 
 export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {

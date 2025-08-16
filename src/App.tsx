@@ -34,6 +34,18 @@ import {
   AgentEdit,
   AgentShow,
 } from "./pages/agents";
+import {
+  ToolList,
+  ToolCreate,
+  ToolEdit,
+  ToolShow,
+} from "./pages/tools";
+import {
+  ApiKeyList,
+  ApiKeyCreate,
+  ApiKeyEdit,
+  ApiKeyShow,
+} from "./pages/api-keys";
 import { Dashboard } from "./pages/dashboard";
 import { AppIcon } from "./components/app-icon";
 import { ColorModeContextProvider } from "./contexts/color-mode";
@@ -71,16 +83,41 @@ function App() {
                     },
                   },
                   {
-                    name: "agents",
-                    list: "/agents",
-                    create: "/agents/create",
-                    edit: "/agents/edit/:id",
-                    show: "/agents/show/:id",
+                    name: "assistants",
+                    list: "/assistants",
+                    create: "/assistants/create",
+                    edit: "/assistants/edit/:id",
+                    show: "/assistants/show/:id",
                     meta: {
                       canDelete: true,
                       icon: <span>🤖</span>,
+                      label: "Assistants",
                     },
                   },
+                          {
+          name: "tools",
+          list: "/tools",
+          create: "/tools/create",
+          edit: "/tools/edit/:id",
+          show: "/tools/show/:id",
+          meta: {
+            canDelete: true,
+            icon: <span>🔧</span>,
+            label: "Tools",
+          },
+        },
+        {
+          name: "api-keys",
+          list: "/api-keys",
+          create: "/api-keys/create",
+          edit: "/api-keys/edit/:id",
+          show: "/api-keys/show/:id",
+          meta: {
+            canDelete: true,
+            icon: <span>🔑</span>,
+            label: "API Keys",
+          },
+        },
                 ]}
                 options={{
                   syncWithLocation: true,
@@ -114,11 +151,23 @@ function App() {
                       <Route path="edit/:id" element={<OrganizationEdit />} />
                       <Route path="show/:id" element={<OrganizationShow />} />
                     </Route>
-                    <Route path="/agents">
+                    <Route path="/assistants">
                       <Route index element={<AgentList />} />
                       <Route path="create" element={<AgentCreate />} />
                       <Route path="edit/:id" element={<AgentEdit />} />
                       <Route path="show/:id" element={<AgentShow />} />
+                    </Route>
+                    <Route path="/tools">
+                      <Route index element={<ToolList />} />
+                      <Route path="create" element={<ToolCreate />} />
+                      <Route path="edit/:id" element={<ToolEdit />} />
+                      <Route path="show/:id" element={<ToolShow />} />
+                    </Route>
+                    <Route path="/api-keys">
+                      <Route index element={<ApiKeyList />} />
+                      <Route path="create" element={<ApiKeyCreate />} />
+                      <Route path="edit/:id" element={<ApiKeyEdit />} />
+                      <Route path="show/:id" element={<ApiKeyShow />} />
                     </Route>
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>

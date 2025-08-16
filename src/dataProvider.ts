@@ -1,10 +1,24 @@
 import { DataProvider } from "@refinedev/core";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3003";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://46.62.135.5:3003";
 
 const getAuthHeader = (): Record<string, string> => {
   const token = localStorage.getItem("refine-auth");
   return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+// Map frontend resource names to backend API endpoints
+const mapResource = (resource: string): string => {
+  if (resource === "assistants") {
+    return "agents";
+  }
+  if (resource === "tools") {
+    return "tools";
+  }
+  if (resource === "api-keys") {
+    return "api-keys";
+  }
+  return resource;
 };
 
 export const dataProvider: DataProvider = {
@@ -12,8 +26,9 @@ export const dataProvider: DataProvider = {
   getList: async ({ resource, pagination }) => {
     const { current = 1, pageSize = 50 } = pagination ?? {};
     const offset = (current - 1) * pageSize;
+    const mappedResource = mapResource(resource);
     
-    const url = `${API_BASE_URL}/api/${resource}?limit=${pageSize}&offset=${offset}`;
+    const url = `${API_BASE_URL}/api/${mappedResource}?limit=${pageSize}&offset=${offset}`;
 
     const response = await fetch(url, {
       headers: {
@@ -35,7 +50,8 @@ export const dataProvider: DataProvider = {
   },
 
   getOne: async ({ resource, id }) => {
-    const response = await fetch(`${API_BASE_URL}/api/${resource}/${id}`, {
+    const mappedResource = mapResource(resource);
+    const response = await fetch(`${API_BASE_URL}/api/${mappedResource}/${id}`, {
       headers: {
         "Content-Type": "application/json",
         ...getAuthHeader(),
@@ -54,7 +70,8 @@ export const dataProvider: DataProvider = {
   },
 
   create: async ({ resource, variables }) => {
-    const response = await fetch(`${API_BASE_URL}/api/${resource}`, {
+    const mappedResource = mapResource(resource);
+    const response = await fetch(`${API_BASE_URL}/api/${mappedResource}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -76,7 +93,8 @@ export const dataProvider: DataProvider = {
   },
 
   update: async ({ resource, id, variables }) => {
-    const response = await fetch(`${API_BASE_URL}/api/${resource}/${id}`, {
+    const mappedResource = mapResource(resource);
+    const response = await fetch(`${API_BASE_URL}/api/${mappedResource}/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -98,7 +116,8 @@ export const dataProvider: DataProvider = {
   },
 
   deleteOne: async ({ resource, id }) => {
-    const response = await fetch(`${API_BASE_URL}/api/${resource}/${id}`, {
+    const mappedResource = mapResource(resource);
+    const response = await fetch(`${API_BASE_URL}/api/${mappedResource}/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
