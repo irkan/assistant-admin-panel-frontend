@@ -1,10 +1,12 @@
 import {
   Refine,
   Authenticated,
+  useList,
 } from "@refinedev/core";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { useEffect } from "react";
 
 import {
   ErrorComponent,
@@ -17,12 +19,11 @@ import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
 import { BrowserRouter, Route, Routes, Outlet } from "react-router";
 import routerBindings, {
-  NavigateToResource,
   CatchAllNavigate,
   UnsavedChangesNotifier,
   DocumentTitleHandler,
 } from "@refinedev/react-router";
-import { Navigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
 import {
   OrganizationList,
@@ -31,11 +32,11 @@ import {
   OrganizationShow,
 } from "./pages/organizations";
 import {
-  AgentList,
-  AgentCreate,
-  AgentEdit,
-  AgentShow,
-} from "./pages/agents";
+  AssistantList,
+  AssistantCreate,
+  AssistantEdit,
+  AssistantShow,
+} from "./pages/assistants";
 import {
   ToolList,
   ToolCreate,
@@ -61,6 +62,36 @@ import { dataProvider } from "./dataProvider";
 
 // Google Client ID - Replace with your actual Google Client ID
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
+
+// Custom component to handle navigation based on user's organizations
+const CustomNavigateToResource: React.FC = () => {
+  const navigate = useNavigate();
+  
+  // Get organizations data to check if user has any
+  const { data: organizationsData, isLoading } = useList({
+    resource: "organizations",
+    pagination: { pageSize: 1 },
+  });
+
+  useEffect(() => {
+    if (!isLoading) {
+      // If user has no organizations, redirect to dashboard
+      if (!organizationsData || organizationsData.total === 0) {
+        navigate("/dashboard", { replace: true });
+      } else {
+        // If user has organizations, navigate to assistants (first resource)
+        navigate("/assistants", { replace: true });
+      }
+    }
+  }, [isLoading, organizationsData, navigate]);
+
+  // Show loading while checking organizations
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return null;
+};
 
 function App() {
   return (
@@ -91,7 +122,6 @@ function App() {
                     {
                       name: "assistants",
                       list: "/assistants",
-                      create: "/assistants/create",
                       edit: "/assistants/edit/:id",
                       show: "/assistants/show/:id",
                       meta: {
@@ -150,6 +180,7 @@ function App() {
                         index
                         element={<Dashboard />}
                       />
+                      <Route path="/dashboard" element={<Dashboard />} />
 
                       <Route path="/organizations">
                         <Route index element={<OrganizationList />} />
@@ -158,10 +189,10 @@ function App() {
                         <Route path="show/:id" element={<OrganizationShow />} />
                       </Route>
                       <Route path="/assistants">
-                        <Route index element={<AgentList />} />
-                        <Route path="create" element={<AgentCreate />} />
-                        <Route path="edit/:id" element={<AgentEdit />} />
-                        <Route path="show/:id" element={<AgentShow />} />
+                        <Route index element={<AssistantList />} />
+                        <Route path="create" element={<AssistantCreate />} />
+                        <Route path="edit/:id" element={<AssistantEdit />} />
+                        <Route path="show/:id" element={<AssistantShow />} />
                       </Route>
                       <Route path="/tools">
                         <Route index element={<ToolList />} />
@@ -183,7 +214,7 @@ function App() {
                           key="authenticated-outer"
                           fallback={<Outlet />}
                         >
-                          <NavigateToResource />
+                          <CustomNavigateToResource />
                         </Authenticated>
                       }
                     >

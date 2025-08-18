@@ -10,7 +10,7 @@ const getAuthHeader = (): Record<string, string> => {
 // Map frontend resource names to backend API endpoints
 const mapResource = (resource: string): string => {
   if (resource === "assistants") {
-    return "agents";
+    return "assistants";
   }
   if (resource === "tools") {
     return "tools";

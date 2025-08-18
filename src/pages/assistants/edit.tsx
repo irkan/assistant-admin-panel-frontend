@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Create } from "@refinedev/mui";
+import { Edit } from "@refinedev/mui";
 import { useForm } from "@refinedev/react-hook-form";
-import { useList } from "@refinedev/core";
+import { useList, useShow } from "@refinedev/core";
 import { Box, TextField, FormControlLabel, Switch, MenuItem } from "@mui/material";
 
 interface Organization {
@@ -10,10 +10,14 @@ interface Organization {
   shortName?: string;
 }
 
-export const AgentCreate: React.FC = () => {
+export const AssistantEdit: React.FC = () => {
   const { saveButtonProps, register, formState: { errors }, setValue, watch } = useForm();
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Get current agent data
+  const { queryResult } = useShow();
+  const { data: agentData } = queryResult;
 
   // Fetch organizations for the select dropdown
   const { data: organizationsData } = useList({
@@ -35,10 +39,17 @@ export const AgentCreate: React.FC = () => {
     }
   }, [organizationsData]);
 
+  // Set the organization ID when agent data loads
+  useEffect(() => {
+    if (agentData?.data?.organization?.id) {
+      setValue("organizationId", agentData.data.organization.id);
+    }
+  }, [agentData, setValue]);
+
   const selectedOrganizationId = watch("organizationId");
 
   return (
-    <Create saveButtonProps={saveButtonProps}>
+    <Edit saveButtonProps={saveButtonProps}>
       <Box
         component="form"
         sx={{ display: "flex", flexDirection: "column" }}
@@ -54,7 +65,6 @@ export const AgentCreate: React.FC = () => {
           fullWidth
           label="Name"
           name="name"
-          autoFocus
         />
         <TextField
           {...register("organizationId", {
@@ -111,7 +121,6 @@ export const AgentCreate: React.FC = () => {
           label="Interaction Mode"
           name="details.interactionMode"
           select
-          defaultValue="agent_speak_first"
         >
           <MenuItem value="agent_speak_first">Agent Speaks First</MenuItem>
           <MenuItem value="user_speak_first">User Speaks First</MenuItem>
@@ -125,7 +134,6 @@ export const AgentCreate: React.FC = () => {
           label="Voice Model"
           name="voiceModel"
           select
-          defaultValue="GPT-4o 2024-11-20"
         >
           <MenuItem value="GPT-4o 2024-11-20">GPT-4o 2024-11-20</MenuItem>
           <MenuItem value="GPT-4o 2024-08-06">GPT-4o 2024-08-06</MenuItem>
@@ -140,7 +148,6 @@ export const AgentCreate: React.FC = () => {
           control={
             <Switch
               {...register("active")}
-              defaultChecked
               name="active"
             />
           }
@@ -148,6 +155,6 @@ export const AgentCreate: React.FC = () => {
           sx={{ mt: 2 }}
         />
       </Box>
-    </Create>
+    </Edit>
   );
 }; 

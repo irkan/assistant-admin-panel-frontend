@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { BooleanField } from "@refinedev/mui";
 
-export const AgentShow: React.FC = () => {
+export const AssistantShow: React.FC = () => {
   const { queryResult } = useShow();
   const { data, isLoading } = queryResult;
 

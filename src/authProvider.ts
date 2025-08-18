@@ -27,9 +27,12 @@ export const authProvider: AuthProvider = {
         localStorage.setItem(TOKEN_KEY, data.data.token);
         localStorage.setItem(USER_KEY, JSON.stringify(data.data.user));
         
+        // If user has no organizations, always redirect to dashboard regardless of ?to= parameter
+        const finalRedirectTo = data.data.hasOrganizations === false ? "/dashboard" : (data.data.redirectTo || "/");
+        
         return {
           success: true,
-          redirectTo: "/",
+          redirectTo: finalRedirectTo,
         };
       } else {
         return {
@@ -73,9 +76,12 @@ export const authProvider: AuthProvider = {
         // Auto-login after successful signup
         localStorage.setItem(TOKEN_KEY, data.data.token);
         localStorage.setItem(USER_KEY, JSON.stringify(data.data.user));
+        // If user has no organizations, always redirect to dashboard regardless of ?to= parameter
+        const finalRedirectTo = data.data.hasOrganizations === false ? "/dashboard" : (data.data.redirectTo || "/");
+        
         return {
           success: true,
-          redirectTo: "/",
+          redirectTo: finalRedirectTo,
         };
       } else {
         return {

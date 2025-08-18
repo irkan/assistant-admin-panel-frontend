@@ -28,7 +28,7 @@ import {
   Star,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router";
-import { useCreate } from "@refinedev/core";
+import { useCreate, useList } from "@refinedev/core";
 
 interface Template {
   id: string;
@@ -110,20 +110,25 @@ export const CreateAssistantModal: React.FC<CreateAssistantModalProps> = ({
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const { mutate: createAssistant } = useCreate();
 
+  // Get user's organizations to set the organizationId
+  const { data: organizationsData } = useList({
+    resource: "organizations",
+    pagination: { pageSize: 1 },
+  });
+  
+  const currentOrganization = organizationsData?.data?.[0];
+
   const handleCreate = () => {
-    if (!assistantName || !selectedTemplate) return;
+    if (!assistantName || !selectedTemplate || !currentOrganization) return;
 
     const assistantData: any = {
       name: assistantName,
       active: true,
-      organizationId: 1, // Default organization
-      voiceModel: selectedTemplate.model || "GPT-4o 2024-11-20",
+      organizationId: currentOrganization.id, // Use current user's organization
       details: {
         firstMessage: selectedTemplate.firstMessage || "Hello.",
         systemPrompt: selectedTemplate.systemPrompt || "This is a blank template with minimal defaults, you can change the model, temperature, and messages.",
-        interactionMode: "assistant-speaks-first",
-        provider: selectedTemplate.provider || "azure-openai",
-        model: selectedTemplate.model || "gpt-4o-2024-11-20",
+        interactionMode: "assistant_speak_first",
       },
     };
 
@@ -135,8 +140,8 @@ export const CreateAssistantModal: React.FC<CreateAssistantModalProps> = ({
       {
         onSuccess: (data) => {
           onClose();
-          // Navigate to the new assistant
-          navigate(`/assistants/edit/${data.data.id}`);
+          // Navigate back to assistants list to see the created assistant
+          navigate("/assistants");
         },
       }
     );

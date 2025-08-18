@@ -74,6 +74,7 @@ interface Agent {
   };
   voiceModel?: string;
   active: boolean;
+  status?: string; // draft, published
   createdAt: string;
   updatedAt?: string;
   details?: {
@@ -108,7 +109,7 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-export const AgentList: React.FC = () => {
+export const AssistantList: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
@@ -124,10 +125,12 @@ export const AgentList: React.FC = () => {
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
   const [silenceTimeout, setSilenceTimeout] = useState(30);
   const [maximumDuration, setMaximumDuration] = useState(600);
-  const [selectedTools, setSelectedTools] = useState<string[]>(["send_text_tool", "google_sheets_tool"]);
+  const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false);
+  const [firstMessage, setFirstMessage] = useState("");
+  const [interactionMode, setInteractionMode] = useState("assistant_speak_first");
 
   const { data, isLoading, refetch } = useList<Agent>({
     resource: "assistants",
@@ -165,32 +168,63 @@ export const AgentList: React.FC = () => {
   const handleAgentSelect = (agent: Agent) => {
     setSelectedAgent(agent);
     setTabValue(0); // Reset to Model tab
+    // Set form values from selected agent
+    setFirstMessage(agent.details?.firstMessage || "Hello.");
+    setInteractionMode(agent.details?.interactionMode || "assistant_speak_first");
+    setSelectedTools([]); // Reset tools for blank template
   };
 
     const handlePublish = () => {
     if (!selectedAgent) return;
     
     setIsPublishing(true);
-    updateAssistant(
-      {
-        resource: "assistants",
-        id: selectedAgent.id,
-        values: {
-          ...selectedAgent,
-          published: true,
-          publishedAt: new Date().toISOString(),
+    
+    // Prepare all form data for publishing
+    const publishData = {
+      name: selectedAgent.name,
+      organizationId: selectedAgent.organizationId || selectedAgent.organization?.id, // Fallback to organization.id
+      active: selectedAgent.active,
+      details: {
+        firstMessage: firstMessage,
+        userPrompt: userPrompt,
+        systemPrompt: selectedAgent.details?.systemPrompt || "This is a blank template with minimal defaults, you can change the model, temperature, and messages.",
+        interactionMode: interactionMode,
+        provider: selectedProvider,
+        model: selectedModel,
+        selectedVoice: selectedVoice,
+        temperature: temperature,
+        silenceTimeout: silenceTimeout,
+        maximumDuration: maximumDuration,
       },
-    },
-    {
-        onSuccess: () => {
-          setIsPublishing(false);
-          refetch();
-        },
-        onError: () => {
-          setIsPublishing(false);
-        },
+      tools: selectedTools
+    };
+
+    console.log('Publishing data:', publishData); // Debug log
+
+    // Use custom fetch to call the publish endpoint
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3003'}/api/assistants/${selectedAgent.id}/publish`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('refine-auth')}`
+      },
+      body: JSON.stringify(publishData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      setIsPublishing(false);
+      if (data.success) {
+        refetch();
+        // Update local state
+        setSelectedAgent({ ...selectedAgent, status: 'published' });
+      } else {
+        console.error('Publish failed:', data.message);
       }
-    );
+    })
+    .catch(error => {
+      setIsPublishing(false);
+      console.error('Publish error:', error);
+    });
   };
 
   // Get models for selected provider
@@ -247,7 +281,7 @@ export const AgentList: React.FC = () => {
   return (
     <List
       title="Assistants"
-      headerButtons={null}
+      headerButtons={<></>}
       breadcrumb={false}
       wrapperProps={{
         sx: { padding: 0 }
@@ -347,10 +381,10 @@ export const AgentList: React.FC = () => {
                   </Box>
                   <Circle
                     sx={{
-                      fontSize: 8,
-                      color: agent.active
+                      fontSize: 12,
+                      color: agent.status === 'published' 
                         ? theme.palette.success.main
-                        : theme.palette.text.disabled,
+                        : '#ff9800', // Orange for draft
                     }}
                   />
                 </Stack>
@@ -397,21 +431,23 @@ export const AgentList: React.FC = () => {
                   >
                     Chat
                   </Button>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={handlePublish}
-                    disabled={isPublishing}
-                    sx={{ 
-                      textTransform: "none",
-                      backgroundColor: theme.palette.success.main,
-                      '&:hover': {
-                        backgroundColor: theme.palette.success.dark,
-                      }
-                    }}
-                  >
-                    {isPublishing ? "Publishing..." : "Publish"}
-                  </Button>
+                  {selectedAgent?.status !== 'published' && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={handlePublish}
+                      disabled={isPublishing}
+                      sx={{ 
+                        textTransform: "none",
+                        backgroundColor: theme.palette.success.main,
+                        '&:hover': {
+                          backgroundColor: theme.palette.success.dark,
+                        }
+                      }}
+                    >
+                      {isPublishing ? "Publishing..." : "Publish"}
+                    </Button>
+                  )}
                   <IconButton 
                     size="small"
                     onClick={(event) => setMenuAnchorEl(event.currentTarget)}
@@ -576,11 +612,12 @@ export const AgentList: React.FC = () => {
                   <FormControl fullWidth>
                     <InputLabel>First Message Mode</InputLabel>
                     <Select
-                      value={selectedAgent.details?.interactionMode || "assistant-speaks-first"}
+                      value={interactionMode}
                       label="First Message Mode"
+                      onChange={(e) => setInteractionMode(e.target.value)}
                     >
-                      <MenuItem value="assistant-speaks-first">Assistant speaks first</MenuItem>
-                      <MenuItem value="assistant-waits-for-user">Assistant waits for user</MenuItem>
+                      <MenuItem value="assistant_speak_first">Assistant speaks first</MenuItem>
+                      <MenuItem value="user_speak_first">User speaks first</MenuItem>
                     </Select>
                   </FormControl>
 
@@ -593,7 +630,8 @@ export const AgentList: React.FC = () => {
                       multiline
                       rows={3}
                       placeholder="Enter the first message..."
-                      value={selectedAgent.details?.firstMessage || "Salam, Azərbaycan Beynəlxalq Bankının virtual köməkçisi Ayladır. Müştəri məmnuniyyəti ilə bağlı qısa bir sorğu keçiririk. Təxminən bir dəqiqənizi alacaq."}
+                      value={firstMessage}
+                      onChange={(e) => setFirstMessage(e.target.value)}
                       variant="outlined"
                     />
                   </Box>

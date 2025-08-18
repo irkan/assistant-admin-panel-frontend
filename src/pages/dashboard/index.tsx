@@ -22,33 +22,39 @@ export const Dashboard: React.FC = () => {
   const { data: identity } = useGetIdentity();
   const [showOrganizationModal, setShowOrganizationModal] = useState(false);
   
-  // Check if user has organizations
-  const { data: organizationsData, isLoading } = useList({
+  // Get organizations data
+  const { data: organizationsData, isLoading: orgsLoading } = useList({
     resource: "organizations",
+    pagination: { pageSize: 1 },
+  });
+
+  // Get assistants data
+  const { data: assistantsData, isLoading: assistantsLoading } = useList({
+    resource: "assistants",
     pagination: { pageSize: 1 },
   });
 
   useEffect(() => {
     // Show modal if user has no organizations and data is loaded
-    if (!isLoading && organizationsData && organizationsData.total === 0) {
+    if (!orgsLoading && organizationsData && organizationsData.total === 0) {
       setShowOrganizationModal(true);
     }
-  }, [isLoading, organizationsData]);
+  }, [orgsLoading, organizationsData]);
 
   const stats = [
     {
       title: "Organizations",
-      value: "0",
+      value: orgsLoading ? "..." : (organizationsData?.total || 0).toString(),
       icon: <Business sx={{ fontSize: 40 }} />,
       color: "#388e3c",
       path: "/organizations",
     },
     {
-      title: "Agents",
-      value: "0",
+      title: "Assistants",
+      value: assistantsLoading ? "..." : (assistantsData?.total || 0).toString(),
       icon: <SmartToy sx={{ fontSize: 40 }} />,
       color: "#f57c00",
-      path: "/agents",
+      path: "/assistants",
     },
   ];
 
@@ -117,9 +123,9 @@ export const Dashboard: React.FC = () => {
             <Button
               variant="contained"
               startIcon={<SmartToy />}
-              onClick={() => navigate("/agents/create")}
+              onClick={() => navigate("/assistants/create")}
             >
-              Add Agent
+              Add Assistant
             </Button>
           </Grid>
         </Grid>

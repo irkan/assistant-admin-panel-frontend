@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useList } from "@refinedev/core";
+import { useList, useCreate } from "@refinedev/core";
 import {
   Box,
   Card,
@@ -36,7 +36,6 @@ import {
   Key as KeyIcon,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-import { useCreate } from "@refinedev/core";
 
 interface ApiKey {
   id: string;
@@ -68,13 +67,16 @@ const CreateApiKeyModal: React.FC<{
   const [transientAssistants, setTransientAssistants] = useState(true);
   const { mutate: create, isLoading } = useCreate();
 
-  // Mock assistants data for dropdown
-  const assistants: Assistant[] = [
-    { id: '1', name: 'New Assistant' },
-    { id: '2', name: 'Narmin' },
-    { id: '3', name: 'Irkan' },
-    { id: '4', name: 'Ayla' },
-  ];
+  // Get assistants from backend
+  const { data: assistantsData, isLoading: assistantsLoading } = useList({
+    resource: 'assistants',
+    pagination: { mode: 'off' },
+  });
+
+  const assistants: Assistant[] = assistantsData?.data?.map((assistant: any) => ({
+    id: assistant.id.toString(),
+    name: assistant.name,
+  })) || [];
 
   const handleSubmit = () => {
     const data = {
