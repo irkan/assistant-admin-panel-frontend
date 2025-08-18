@@ -3,17 +3,22 @@ import type { AuthProvider } from "@refinedev/core";
 export const TOKEN_KEY = "refine-auth";
 export const USER_KEY = "refine-user";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://46.62.135.5:3003";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3003";
 
 export const authProvider: AuthProvider = {
-  login: async ({ email, password }) => {
+  login: async ({ email, password, googleId, provider }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ 
+          email, 
+          password, 
+          googleId, 
+          provider 
+        }),
       });
 
       const data = await response.json();
@@ -21,6 +26,7 @@ export const authProvider: AuthProvider = {
       if (data.success) {
         localStorage.setItem(TOKEN_KEY, data.data.token);
         localStorage.setItem(USER_KEY, JSON.stringify(data.data.user));
+        
         return {
           success: true,
           redirectTo: "/",
@@ -44,12 +50,58 @@ export const authProvider: AuthProvider = {
       };
     }
   },
+  register: async ({ email, password, name, surname, googleId, provider }) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          email, 
+          password, 
+          name, 
+          surname,
+          googleId,
+          provider 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Auto-login after successful signup
+        localStorage.setItem(TOKEN_KEY, data.data.token);
+        localStorage.setItem(USER_KEY, JSON.stringify(data.data.user));
+        return {
+          success: true,
+          redirectTo: "/",
+        };
+      } else {
+        return {
+          success: false,
+          error: {
+            name: "RegisterError",
+            message: data.message || "Registration failed",
+          },
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: {
+          name: "RegisterError",
+          message: "Network error. Please try again.",
+        },
+      };
+    }
+  },
   logout: async () => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     return {
       success: true,
-      redirectTo: "/login",
+      redirectTo: "/signin",
     };
   },
   check: async () => {
@@ -72,7 +124,7 @@ export const authProvider: AuthProvider = {
           localStorage.removeItem(USER_KEY);
           return {
             authenticated: false,
-            redirectTo: "/login",
+            redirectTo: "/signin",
           };
         }
       } catch (error) {
@@ -80,14 +132,14 @@ export const authProvider: AuthProvider = {
         localStorage.removeItem(USER_KEY);
         return {
           authenticated: false,
-          redirectTo: "/login",
+          redirectTo: "/signin",
         };
       }
     }
 
     return {
       authenticated: false,
-      redirectTo: "/login",
+      redirectTo: "/signin",
     };
   },
   getPermissions: async () => null,

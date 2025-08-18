@@ -1,10 +1,11 @@
 import React from "react";
 import { useForm } from "@refinedev/react-hook-form";
+import { Controller } from "react-hook-form";
 import { Edit   } from "@refinedev/mui";
 import { Box, TextField, FormControlLabel, Switch } from "@mui/material";
 
 export const OrganizationEdit: React.FC = () => {
-  const { saveButtonProps, register, formState: { errors } } = useForm();
+  const { saveButtonProps, register, control, formState: { errors } } = useForm();
 
   return (
     <Edit saveButtonProps={saveButtonProps}>
@@ -48,15 +49,23 @@ export const OrganizationEdit: React.FC = () => {
           name="parentId"
           type="number"
         />
-        <FormControlLabel
-          control={
-            <Switch
-              {...register("active")}
-              name="active"
+        <Controller
+          name="active"
+          control={control}
+          defaultValue={true}
+          render={({ field: { onChange, value } }) => (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={!!value}
+                  onChange={onChange}
+                  name="active"
+                />
+              }
+              label="Active"
+              sx={{ mt: 2 }}
             />
-          }
-          label="Active"
-          sx={{ mt: 2 }}
+          )}
         />
       </Box>
     </Edit>

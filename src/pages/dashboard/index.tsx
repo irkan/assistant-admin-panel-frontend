@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -14,9 +14,26 @@ import {
   Dashboard as DashboardIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router";
+import { useGetIdentity, useList } from "@refinedev/core";
+import { OrganizationModal } from "../../components/OrganizationModal";
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { data: identity } = useGetIdentity();
+  const [showOrganizationModal, setShowOrganizationModal] = useState(false);
+  
+  // Check if user has organizations
+  const { data: organizationsData, isLoading } = useList({
+    resource: "organizations",
+    pagination: { pageSize: 1 },
+  });
+
+  useEffect(() => {
+    // Show modal if user has no organizations and data is loaded
+    if (!isLoading && organizationsData && organizationsData.total === 0) {
+      setShowOrganizationModal(true);
+    }
+  }, [isLoading, organizationsData]);
 
   const stats = [
     {
@@ -107,6 +124,16 @@ export const Dashboard: React.FC = () => {
           </Grid>
         </Grid>
       </Paper>
+
+      {/* Organization Modal */}
+      <OrganizationModal
+        open={showOrganizationModal}
+        onClose={(success) => {
+          if (success) {
+            setShowOrganizationModal(false);
+          }
+        }}
+      />
     </Box>
   );
 }; 

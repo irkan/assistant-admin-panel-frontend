@@ -25,9 +25,11 @@ export const OrganizationShow: React.FC = () => {
         <Typography variant="body1">
           <strong>Short Name:</strong> {record?.shortName || "N/A"}
         </Typography>
-        <Typography variant="body1">
-          <strong>Parent ID:</strong> {record?.parentId || "None"}
-        </Typography>
+        {record?.parentId && (
+          <Typography variant="body1">
+            <strong>Parent ID:</strong> {record.parentId}
+          </Typography>
+        )}
         <Typography variant="body1">
           <strong>Active:</strong> <BooleanField value={record?.active} />
         </Typography>
