@@ -512,10 +512,10 @@ export const AssistantList: React.FC = () => {
 
               {/* Tags */}
               <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-                <Chip label="vapi" size="small" color="success" />
+                <Chip label="deepgram" size="small" color="success" />
                 <Chip label="azure" size="small" color="warning" />
-                <Chip label="azure openai" size="small" color="info" />
-                <Chip label="vapi" size="small" color="success" />
+                <Chip label="openai" size="small" color="info" />
+                <Chip label="gemini" size="small" color="error" />
                 <Chip label="web" size="small" />
               </Stack>
 
