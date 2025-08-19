@@ -80,11 +80,21 @@ interface Agent {
   details?: {
     agentId: string;
     firstMessage?: string;
+    userPrompt?: string;
     systemPrompt?: string;
     interactionMode?: string;
     provider?: string;
     model?: string;
+    selectedVoice?: string;
+    temperature?: number;
+    silenceTimeout?: number;
+    maximumDuration?: number;
   };
+  tools?: Array<{
+    id: number;
+    toolId: string;
+    toolName: string;
+  }>;
 }
 
 interface TabPanelProps {
@@ -142,6 +152,31 @@ export const AssistantList: React.FC = () => {
 
   const { mutate: updateAssistant } = useUpdate();
 
+  // Refresh form when selectedAgent changes
+  useEffect(() => {
+    if (selectedAgent) {
+      // Set all form values from selected agent details
+      setFirstMessage(selectedAgent.details?.firstMessage || "Hello.");
+      setUserPrompt(selectedAgent.details?.userPrompt || "");
+      setInteractionMode(selectedAgent.details?.interactionMode || "assistant_speak_first");
+      
+      // Set provider and model
+      setSelectedProvider(selectedAgent.details?.provider || "azure-openai");
+      setSelectedModel(selectedAgent.details?.model || "gpt-4o-2024-11-20");
+      
+      // Set voice settings
+      setSelectedVoice(selectedAgent.details?.selectedVoice || "zephyr");
+      
+      // Set advanced settings with proper defaults
+      setTemperature(selectedAgent.details?.temperature ?? 0.7);
+      setSilenceTimeout(selectedAgent.details?.silenceTimeout ?? 30);
+      setMaximumDuration(selectedAgent.details?.maximumDuration ?? 600);
+      
+      // Set tools from agent data or empty array
+      setSelectedTools(selectedAgent.tools?.map(tool => tool.toolId) || []);
+    }
+  }, [selectedAgent]);
+
   const agents = (data?.data || []) as Agent[];
 
   // Filter agents based on search
@@ -168,10 +203,26 @@ export const AssistantList: React.FC = () => {
   const handleAgentSelect = (agent: Agent) => {
     setSelectedAgent(agent);
     setTabValue(0); // Reset to Model tab
-    // Set form values from selected agent
+    
+    // Set all form values from selected agent details
     setFirstMessage(agent.details?.firstMessage || "Hello.");
+    setUserPrompt(agent.details?.userPrompt || "");
     setInteractionMode(agent.details?.interactionMode || "assistant_speak_first");
-    setSelectedTools([]); // Reset tools for blank template
+    
+    // Set provider and model
+    setSelectedProvider(agent.details?.provider || "azure-openai");
+    setSelectedModel(agent.details?.model || "gpt-4o-2024-11-20");
+    
+    // Set voice settings
+    setSelectedVoice(agent.details?.selectedVoice || "zephyr");
+    
+    // Set advanced settings with proper defaults
+    setTemperature(agent.details?.temperature ?? 0.7);
+    setSilenceTimeout(agent.details?.silenceTimeout ?? 30);
+    setMaximumDuration(agent.details?.maximumDuration ?? 600);
+    
+    // Set tools from agent data or empty array
+    setSelectedTools(agent.tools?.map(tool => tool.toolId) || []);
   };
 
     const handlePublish = () => {
