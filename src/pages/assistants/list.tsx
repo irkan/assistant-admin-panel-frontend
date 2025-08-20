@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { List } from "@refinedev/mui";
-import { useList, useUpdate } from "@refinedev/core";
+import { useList, useUpdate, useDelete } from "@refinedev/core";
 import { CreateAssistantModal } from "../../components";
 import toolTypesData from "../../data/toolTypes.json";
 import {
@@ -176,6 +176,8 @@ export const AssistantList: React.FC = () => {
     },
   });
 
+  const { mutate: deleteAgent } = useDelete();
+
   const { mutate: updateAssistant } = useUpdate();
 
   // Refresh form when selectedAgent changes
@@ -321,7 +323,7 @@ export const AssistantList: React.FC = () => {
       tools: selectedTools
     };
 
-    console.log('Publishing data:', publishData); // Debug log
+    console.log('Publishing data:', publishData);
 
     // Use custom fetch to call the publish endpoint
     fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3003'}/api/assistants/${selectedAgent.id}/publish`, {
@@ -361,6 +363,27 @@ export const AssistantList: React.FC = () => {
     .catch(error => {
       setIsPublishing(false);
       console.error('Publish error:', error);
+    });
+  };
+
+  // Handle delete assistant
+  const handleDelete = () => {
+    if (!selectedAgent) return;
+
+    deleteAgent({
+      resource: "assistants",
+      id: selectedAgent.id,
+    }, {
+      onSuccess: () => {
+        console.log('Assistant deleted successfully');
+        setDeleteModalOpen(false);
+        setSelectedAgent(null); // Clear selection
+        refetch(); // Refresh the list
+      },
+      onError: (error) => {
+        console.error('Delete failed:', error);
+        setDeleteModalOpen(false);
+      }
     });
   };
 
@@ -1476,6 +1499,10 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
           Delete Assistant
         </Typography>
         
+        <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
+          "{selectedAgent?.name}"
+        </Typography>
+        
         <Typography variant="body2" color="text.secondary">
           Are you sure you want to delete this Assistant? You can't undo this action afterwards.
         </Typography>
@@ -1494,11 +1521,7 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
         </Button>
         <Button
           variant="contained"
-          onClick={() => {
-            setDeleteModalOpen(false);
-            // Handle delete logic here
-            console.log('Delete assistant:', selectedAgent?.id);
-          }}
+          onClick={handleDelete}
           sx={{ 
             textTransform: 'none',
             backgroundColor: '#ef4444',
