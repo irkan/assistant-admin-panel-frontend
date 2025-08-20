@@ -39,6 +39,7 @@ import {
   Drawer,
   AppBar,
   Toolbar,
+  Avatar,
 } from "@mui/material";
 import {
   Add,
@@ -58,10 +59,12 @@ import {
   Phone,
   FileCopy,
   Close,
+  SmartToy,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router";
 import dayjs from "dayjs";
 import providersData from "../../data/providers.json";
+import "../../styles/modern-theme.css";
 
 interface Agent {
   id: number;
@@ -124,6 +127,26 @@ export const AssistantList: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Modern gradient backgrounds for cards
+  const cardBackgrounds = [
+    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+    "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+    "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+    "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+    "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+    "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
+    "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+    "linear-gradient(135deg, #667db6 0%, #0082c8 100%)",
+    "linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)",
+    "linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%)",
+    "linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%)"
+  ];
+
+  const getCardBackground = (index: number) => {
+    return cardBackgrounds[index % cardBackgrounds.length];
+  };
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [tabValue, setTabValue] = useState(0);
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -406,17 +429,70 @@ export const AssistantList: React.FC = () => {
   };
 
   return (
-    <List
-      title="Assistants"
-      headerButtons={<></>}
-      breadcrumb={false}
-      wrapperProps={{
-        sx: { padding: 0 }
-      }}
-      contentProps={{
-        sx: { padding: 0 }
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "url('/assets/backgrounds/geometric-bg.svg') no-repeat center center",
+        backgroundSize: "cover",
+        position: "relative",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.9) 100%)",
+          zIndex: 0,
+        },
       }}
     >
+      <Box className="bg-pattern-grid" sx={{ position: "absolute", inset: 0, opacity: 0.1, zIndex: 1 }} />
+      <Box sx={{ position: "relative", zIndex: 2 }}>
+        <List
+          title={
+            <Box sx={{ mb: 6, pt: 4 }}>
+              <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+                <Avatar
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    background: "var(--gradient-primary)",
+                    boxShadow: "var(--shadow-glow)",
+                  }}
+                >
+                  <SmartToy sx={{ fontSize: 24 }} />
+                </Avatar>
+                <Box>
+                  <Typography 
+                    variant="h3" 
+                    sx={{ 
+                      fontWeight: 800,
+                      background: "linear-gradient(135deg, #ffffff 0%, #a78bfa 100%)",
+                      backgroundClip: "text",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      mb: 0.5,
+                    }}
+                  >
+                    Assistant Overview
+                  </Typography>
+                  <Typography variant="body1" sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+                    Welcome back! Here's what's happening with your assistants today.
+                  </Typography>
+                </Box>
+              </Stack>
+            </Box>
+          }
+          headerButtons={<></>}
+          breadcrumb={false}
+          wrapperProps={{
+            sx: { padding: 0 }
+          }}
+          contentProps={{
+            sx: { padding: 0 }
+          }}
+        >
       <Box sx={{ height: "calc(100vh - 128px)", display: "flex", overflow: "hidden" }}>
       {/* Left Sidebar */}
       <Box
@@ -436,14 +512,19 @@ export const AssistantList: React.FC = () => {
           startIcon={<Add />}
             onClick={() => setCreateModalOpen(true)}
             sx={{
+              background: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
               textTransform: "none",
-              fontWeight: 500,
-              py: 1,
+              borderRadius: "12px",
+              fontWeight: 600,
+              px: 3,
+              py: 1.5,
               mb: 2,
-              backgroundColor: theme.palette.mode === 'dark' ? '#10b981' : '#059669',
-              '&:hover': {
-                backgroundColor: theme.palette.mode === 'dark' ? '#059669' : '#047857',
-              }
+              boxShadow: "0 4px 16px rgba(79, 172, 254, 0.3)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #3b9bfe 0%, #00d9fe 100%)",
+                transform: "translateY(-2px)",
+                boxShadow: "0 8px 24px rgba(79, 172, 254, 0.4)",
+              },
             }}
           >
             Create Assistant
@@ -465,7 +546,25 @@ export const AssistantList: React.FC = () => {
             }}
             sx={{
               "& .MuiOutlinedInput-root": {
-                borderRadius: 1,
+                background: "rgba(255, 255, 255, 0.1)",
+                backdropFilter: "blur(10px)",
+                borderRadius: "12px",
+                border: `1px solid ${theme.palette.divider}`,
+                color: theme.palette.text.primary,
+                "&:hover": {
+                  borderColor: theme.palette.primary.main,
+                },
+                "&.Mui-focused": {
+                  borderColor: "#4facfe",
+                  boxShadow: "0 0 0 3px rgba(79, 172, 254, 0.1)",
+                },
+              },
+              "& .MuiInputBase-input": {
+                color: theme.palette.text.primary,
+                "&::placeholder": {
+                  color: theme.palette.text.secondary,
+                  opacity: 1,
+                },
               },
             }}
           />
@@ -473,7 +572,7 @@ export const AssistantList: React.FC = () => {
 
         {/* Agent List */}
         <Box sx={{ flex: 1, overflow: "auto", p: 1 }}>
-          {filteredAgents.map((agent) => (
+          {filteredAgents.map((agent, index) => (
             <Card
               key={agent.id}
               onClick={() => handleAgentSelect(agent)}
@@ -483,16 +582,29 @@ export const AssistantList: React.FC = () => {
                 border: `1px solid ${
                   selectedAgent?.id === agent.id
                     ? theme.palette.primary.main
-                    : "transparent"
+                    : "rgba(255,255,255,0.12)"
                 }`,
-                backgroundColor:
+                background:
                   selectedAgent?.id === agent.id
-                    ? alpha(theme.palette.primary.main, 0.08)
-                    : "transparent",
+                    ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.primary.main, 0.1)})`
+                    : `linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))`,
+                position: "relative",
+                overflow: "hidden",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 3,
+                  background: getCardBackground(index),
+                },
+                backdropFilter: "blur(6px)",
                 transition: "all 0.2s",
                 "&:hover": {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                  borderColor: alpha(theme.palette.primary.main, 0.3),
+                  backgroundColor: alpha(theme.palette.primary.main, 0.06),
+                  borderColor: alpha(theme.palette.primary.main, 0.35),
+                  transform: "translateY(-2px)",
                 },
               }}
             >
@@ -536,9 +648,20 @@ export const AssistantList: React.FC = () => {
             {/* Agent Header */}
             <Box
               sx={{
-                p: 2,
+                p: 3,
                 borderBottom: `1px solid ${theme.palette.divider}`,
-                backgroundColor: theme.palette.background.paper,
+                background: `linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))`,
+                backdropFilter: "blur(12px)",
+                position: "relative",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 4,
+                  background: "linear-gradient(90deg, #4facfe 0%, #00f2fe 50%, #43e97b 100%)",
+                },
               }}
             >
               <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -558,14 +681,40 @@ export const AssistantList: React.FC = () => {
                     variant="outlined"
                     size="small"
                     startIcon={<ContentCopy />}
-                    sx={{ textTransform: "none" }}
+                    sx={{ 
+                      textTransform: "none",
+                      borderRadius: "8px",
+                      fontWeight: 500,
+                      px: 2,
+                      py: 0.5,
+                      border: `1px solid ${theme.palette.divider}`,
+                      color: theme.palette.text.primary,
+                      "&:hover": {
+                        borderColor: "#4facfe",
+                        backgroundColor: "rgba(79, 172, 254, 0.1)",
+                        transform: "translateY(-1px)",
+                      },
+                    }}
                   >
                     Test
                   </Button>
                   <Button
                     variant="outlined"
                     size="small"
-                    sx={{ textTransform: "none" }}
+                    sx={{ 
+                      textTransform: "none",
+                      borderRadius: "8px",
+                      fontWeight: 500,
+                      px: 2,
+                      py: 0.5,
+                      border: `1px solid ${theme.palette.divider}`,
+                      color: theme.palette.text.primary,
+                      "&:hover": {
+                        borderColor: "#f093fb",
+                        backgroundColor: "rgba(240, 147, 251, 0.1)",
+                        transform: "translateY(-1px)",
+                      },
+                    }}
                   >
                     Chat
                   </Button>
@@ -575,10 +724,21 @@ export const AssistantList: React.FC = () => {
                     onClick={handlePublish}
                     disabled={isPublishing}
                     sx={{ 
+                      background: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
                       textTransform: "none",
-                      backgroundColor: theme.palette.success.main,
-                      '&:hover': {
-                        backgroundColor: theme.palette.success.dark,
+                      borderRadius: "8px",
+                      fontWeight: 600,
+                      px: 2,
+                      py: 1,
+                      boxShadow: "0 4px 16px rgba(67, 233, 123, 0.3)",
+                      "&:hover": {
+                        background: "linear-gradient(135deg, #32d965 0%, #2de6c7 100%)",
+                        transform: "translateY(-1px)",
+                        boxShadow: "0 6px 20px rgba(67, 233, 123, 0.4)",
+                      },
+                      "&:disabled": {
+                        background: "rgba(255, 255, 255, 0.1)",
+                        color: "rgba(255, 255, 255, 0.5)",
                       }
                     }}
                   >
@@ -866,12 +1026,24 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
                         label="Provider"
                         disabled={true}
                         sx={{
-                          bgcolor: 'rgba(0, 0, 0, 0.04)',
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            borderColor: 'rgba(0, 0, 0, 0.15)',
+                          background: "rgba(255, 255, 255, 0.1)",
+                          backdropFilter: "blur(10px)",
+                          borderRadius: "12px",
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            border: `1px solid ${theme.palette.divider}`,
                           },
-                          '& .MuiSelect-select': {
-                            color: 'rgba(0, 0, 0, 0.6)',
+                          "&:hover .MuiOutlinedInput-notchedOutline": {
+                            borderColor: theme.palette.primary.main,
+                          },
+                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#4facfe",
+                            boxShadow: "0 0 0 3px rgba(79, 172, 254, 0.1)",
+                          },
+                          "& .MuiSelect-select": {
+                            color: theme.palette.text.secondary,
+                          },
+                          "& .MuiInputLabel-root": {
+                            color: theme.palette.text.secondary,
                           }
                         }}
                       >
@@ -887,6 +1059,27 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
                         value={selectedModel}
                         label="Model"
                         onChange={(e) => setSelectedModel(e.target.value)}
+                        sx={{
+                          background: "rgba(255, 255, 255, 0.1)",
+                          backdropFilter: "blur(10px)",
+                          borderRadius: "12px",
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            border: `1px solid ${theme.palette.divider}`,
+                          },
+                          "&:hover .MuiOutlinedInput-notchedOutline": {
+                            borderColor: theme.palette.primary.main,
+                          },
+                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#4facfe",
+                            boxShadow: "0 0 0 3px rgba(79, 172, 254, 0.1)",
+                          },
+                          "& .MuiSelect-select": {
+                            color: theme.palette.text.primary,
+                          },
+                          "& .MuiInputLabel-root": {
+                            color: theme.palette.text.secondary,
+                          }
+                        }}
                       >
                         {getModelsForProvider("google").map((model) => (
                           <MenuItem key={model.id} value={model.id}>
@@ -1444,6 +1637,8 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
         refetch(); // Refresh the list after creating
         }}
       />
-    </List>
+        </List>
+      </Box>
+    </Box>
   );
 }; 

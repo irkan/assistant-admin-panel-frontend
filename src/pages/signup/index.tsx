@@ -8,6 +8,9 @@ import {
   Link,
   Paper,
   Avatar,
+  Container,
+  Stack,
+  Fade,
 } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -15,6 +18,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import GoogleIcon from '@mui/icons-material/Google';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useRegister } from "@refinedev/core";
+import { PersonAdd, Security, Star } from "@mui/icons-material";
+import "../../styles/modern-theme.css";
 
 const testimonials = [
   {
@@ -73,47 +78,112 @@ const testimonials = [
   },
 ];
 
-const lightTheme = createTheme({
+const modernTheme = createTheme({
   palette: {
-    mode: "light",
+    mode: "dark",
     background: {
-      default: "#ffffff",
-      paper: "#f8fafc",
+      default: "transparent",
+      paper: "rgba(255, 255, 255, 0.1)",
     },
     primary: {
-      main: "#4ade80",
+      main: "#3b82f6",
+      light: "#60a5fa",
+      dark: "#1d4ed8",
+    },
+    secondary: {
+      main: "#8b5cf6",
+      light: "#a78bfa",
+      dark: "#7c3aed",
     },
     text: {
-      primary: "#1f2937",
-      secondary: "#6b7280",
+      primary: "#ffffff",
+      secondary: "rgba(255, 255, 255, 0.7)",
     },
   },
   typography: {
-    fontFamily: "Inter, sans-serif",
+    fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    h3: {
+      fontWeight: 800,
+      letterSpacing: "-0.025em",
+    },
+    h5: {
+      fontWeight: 700,
+      letterSpacing: "-0.015em",
+    },
+    body1: {
+      fontSize: "1rem",
+      lineHeight: 1.6,
+    },
+    body2: {
+      fontSize: "0.875rem",
+      lineHeight: 1.5,
+    },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
           textTransform: "none",
-          borderRadius: "8px",
+          borderRadius: "12px",
+          fontWeight: 600,
+          padding: "12px 24px",
+          transition: "all 0.2s ease-in-out",
+        },
+        contained: {
+          background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+          boxShadow: "0 4px 16px rgba(59, 130, 246, 0.3)",
+          "&:hover": {
+            background: "linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)",
+            transform: "translateY(-2px)",
+            boxShadow: "0 8px 24px rgba(59, 130, 246, 0.4)",
+          },
+        },
+        outlined: {
+          borderColor: "rgba(255, 255, 255, 0.3)",
+          color: "white",
+          "&:hover": {
+            borderColor: "rgba(255, 255, 255, 0.5)",
+            backgroundColor: "rgba(255, 255, 255, 0.05)",
+          },
         },
       },
     },
     MuiTextField: {
       styleOverrides: {
         root: {
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-              borderColor: '#d1d5db',
+          "& .MuiOutlinedInput-root": {
+            backgroundColor: "rgba(255, 255, 255, 0.05)",
+            borderRadius: "12px",
+            "& fieldset": {
+              borderColor: "rgba(255, 255, 255, 0.2)",
             },
-            '&:hover fieldset': {
-              borderColor: '#9ca3af',
+            "&:hover fieldset": {
+              borderColor: "rgba(255, 255, 255, 0.3)",
             },
-            '&.Mui-focused fieldset': {
-              borderColor: '#4ade80',
+            "&.Mui-focused fieldset": {
+              borderColor: "#3b82f6",
+              boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)",
             },
           },
+          "& .MuiInputLabel-root": {
+            color: "rgba(255, 255, 255, 0.7)",
+            "&.Mui-focused": {
+              color: "#3b82f6",
+            },
+          },
+          "& .MuiOutlinedInput-input": {
+            color: "white",
+          },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: "none",
+          backgroundColor: "rgba(255, 255, 255, 0.08)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
         },
       },
     },
@@ -184,224 +254,298 @@ export const Signup = () => {
   };
   
   return (
-    <ThemeProvider theme={lightTheme}>
+    <ThemeProvider theme={modernTheme}>
       <CssBaseline />
-      <Grid container sx={{ height: "100vh", alignItems: "center", justifyContent: "center" }}>
-        <Grid
-          item
-          xs={12}
-          md={6}
-          sx={{ 
-            display: "flex", 
-            justifyContent: "center", 
-            alignItems: "center",
-            p: 4,
-            minHeight: "100vh"
-          }}
-        >
-          <Box sx={{ maxWidth: 400, width: "100%" }}>
-            <Typography 
-              variant="h5" 
-              component="h1" 
-              gutterBottom
-              sx={{ 
-                fontWeight: 600,
-                color: "#1f2937",
-                mb: 1
-              }}
-            >
-              Create your account
-            </Typography>
-            <Typography 
-              variant="body2" 
-              color="text.secondary" 
-              sx={{ mb: 4 }}
-            >
-              Enter an email and create a password, getting started is easy!
-            </Typography>
-            
-            {/* Google Sign Up Button */}
-            <Button 
-              fullWidth 
-              variant="outlined" 
-              startIcon={<GoogleIcon />} 
-              sx={{ 
-                borderColor: '#d1d5db', 
-                color: '#374151',
-                mb: 3,
-                py: 1.5,
-                '&:hover': {
-                  borderColor: '#9ca3af',
-                  backgroundColor: '#f9fafb'
-                }
-              }}
-              onClick={() => handleGoogleSignUp()}
-            >
-              Sign up with Google
-            </Button>
-
-            <Typography align="center" variant="body2" color="text.secondary" sx={{ my: 3 }}>
-              OR SIGN UP WITH
-            </Typography>
-
-            <Box component="form" noValidate onSubmit={handleSubmit}>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="name"
-                label="Your first name"
-                name="name"
-                autoComplete="given-name"
-                autoFocus
-                variant="outlined"
-                value={formData.name}
-                onChange={handleInputChange}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="surname"
-                label="Your last name"
-                name="surname"
-                autoComplete="family-name"
-                variant="outlined"
-                value={formData.surname}
-                onChange={handleInputChange}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Your email address"
-                name="email"
-                autoComplete="email"
-                variant="outlined"
-                value={formData.email}
-                onChange={handleInputChange}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Your password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                variant="outlined"
-                value={formData.password}
-                onChange={handleInputChange}
-                sx={{ mb: 3 }}
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ 
-                  mt: 2, 
-                  mb: 3, 
-                  py: 1.5, 
-                  backgroundColor: '#4ade80', 
-                  '&:hover': {
-                    backgroundColor: '#22c55e'
-                  },
-                  fontWeight: 600
-                }}
-              >
-                Sign Up
-              </Button>
-              <Typography variant="body2" align="center" color="text.secondary">
-                Already have an account?{" "}
-                <Link href="/signin" variant="body2" sx={{ color: '#4ade80', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
-                  Sign in
-                </Link>
-              </Typography>
-            </Box>
-          </Box>
-        </Grid>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          background: "url('/assets/backgrounds/mesh-bg.svg') no-repeat center center",
+          backgroundSize: "cover",
+          position: "relative",
+          overflow: "hidden",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "var(--gradient-mesh)",
+            opacity: 0.8,
+          },
+        }}
+      >
+        <Box className="bg-pattern-dots" sx={{ position: "absolute", inset: 0, opacity: 0.3 }} />
         
-        {/* Right side with SVG background and testimonial slider */}
-        <Grid
-          item
-          md={6}
-          sx={{
-            display: { xs: "none", md: "flex" },
-            alignItems: "center",
-            justifyContent: "center",
-            p: 4,
-            minHeight: "100vh",
-            background: "url('/signup-background.svg') no-repeat center center",
-            backgroundSize: "cover",
-            position: "relative",
-          }}
-        >
-          {/* Overlay for better text readability */}
-          <Box
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-              backdropFilter: "blur(1px)",
-            }}
-          />
-          
-          {/* Testimonial slider with dynamic height */}
-          <Box sx={{ width: 400, position: 'relative', zIndex: 1 }}>
-             <AnimatePresence mode="wait">
-                <motion.div
-                    key={currentTestimonial}
-                    variants={slideVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    transition={{ duration: 0.5 }}
-                    style={{ position: 'relative', width: '100%' }}
-                >
-                    <Paper
-                      elevation={6}
+        <Container maxWidth="xl" sx={{ position: "relative", zIndex: 2, minHeight: "100vh" }}>
+          <Grid container sx={{ minHeight: "100vh", alignItems: "center", justifyContent: "center" }}>
+            {/* Left Side - Brand & Features */}
+            <Grid
+              item
+              xs={12}
+              md={6}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "flex-start",
+                p: 4,
+                minHeight: "100vh",
+              }}
+            >
+              <Fade in timeout={800}>
+                <Box sx={{ mb: 6 }}>
+                  <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 4 }}>
+                    <Avatar
                       sx={{
-                        p: 3,
-                        borderRadius: "16px",
-                        bgcolor: "rgba(255, 255, 255, 0.95)",
-                        backdropFilter: "blur(10px)",
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        minHeight: 'auto', // Dynamic height
-                        display: 'flex',
-                        flexDirection: 'column',
-                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                        width: 56,
+                        height: 56,
+                        background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+                        boxShadow: "var(--shadow-glow)",
                       }}
                     >
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                        <Avatar sx={{ bgcolor: "#4ade80", mr: 2, color: '#ffffff', fontWeight: 'bold' }}>
-                          {testimonials[currentTestimonial].avatar}
-                        </Avatar>
-                        <Box>
-                          <Typography variant="subtitle1" sx={{ color: '#1f2937', fontWeight: 600 }}>
-                            {testimonials[currentTestimonial].author}
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: '#6b7280' }}>
-                            {testimonials[currentTestimonial].handle}
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Box sx={{ flex: 1 }}>
-                        {testimonials[currentTestimonial].content}
-                      </Box>
-                    </Paper>
-                </motion.div>
-             </AnimatePresence>
-          </Box>
-        </Grid>
-      </Grid>
+                      <PersonAdd sx={{ fontSize: 28 }} />
+                    </Avatar>
+                    <Box>
+                      <Typography
+                        variant="h3"
+                        sx={{
+                          background: "linear-gradient(135deg, #ffffff 0%, #a78bfa 100%)",
+                          backgroundClip: "text",
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                          mb: 0.5,
+                        }}
+                      >
+                        Join Admin Panel
+                      </Typography>
+                      <Typography variant="body1" sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+                        Create your account and start managing assistants
+                      </Typography>
+                    </Box>
+                  </Stack>
+
+                  {/* Features */}
+                  <Stack spacing={3}>
+                    {[
+                      { icon: <Security />, title: "Secure & Private", desc: "Your data is protected with enterprise-grade security" },
+                      { icon: <Star />, title: "Easy Management", desc: "Intuitive interface for managing AI assistants" },
+                      { icon: <PersonAdd />, title: "Quick Setup", desc: "Get started in minutes with our guided setup" },
+                    ].map((feature, index) => (
+                      <Fade key={index} in timeout={1200 + index * 200}>
+                        <Stack direction="row" alignItems="center" spacing={2}>
+                          <Avatar
+                            sx={{
+                              width: 40,
+                              height: 40,
+                              background: "rgba(255, 255, 255, 0.1)",
+                              backdropFilter: "blur(10px)",
+                            }}
+                          >
+                            {feature.icon}
+                          </Avatar>
+                          <Box>
+                            <Typography variant="subtitle1" sx={{ color: "white", fontWeight: 600 }}>
+                              {feature.title}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+                              {feature.desc}
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </Fade>
+                    ))}
+                  </Stack>
+                </Box>
+              </Fade>
+            </Grid>
+
+            {/* Right Side - Signup Form */}
+            <Grid
+              item
+              xs={12}
+              md={6}
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                p: 4,
+                minHeight: "100vh",
+              }}
+            >
+              <Fade in timeout={1000}>
+                <Paper
+                  className="modern-card scale-in"
+                  sx={{
+                    maxWidth: 450,
+                    width: "100%",
+                    p: 4,
+                    background: "rgba(255, 255, 255, 0.08)",
+                    backdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "20px",
+                    boxShadow: "0 32px 64px rgba(0, 0, 0, 0.2)",
+                  }}
+                >
+                  <Typography
+                    variant="h5"
+                    component="h1"
+                    gutterBottom
+                    sx={{
+                      fontWeight: 700,
+                      color: "white",
+                      mb: 1,
+                      textAlign: "center",
+                    }}
+                  >
+                    Create Account
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 4, textAlign: "center" }}
+                  >
+                    Join our platform and start building amazing AI assistants
+                  </Typography>
+            
+                  {/* Google Sign Up Button */}
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<GoogleIcon />}
+                    sx={{
+                      mb: 3,
+                      py: 1.5,
+                      borderColor: "rgba(255, 255, 255, 0.3)",
+                      color: "white",
+                      "&:hover": {
+                        borderColor: "rgba(255, 255, 255, 0.5)",
+                        backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      },
+                    }}
+                    onClick={() => handleGoogleSignUp()}
+                  >
+                    Continue with Google
+                  </Button>
+
+                  <Box sx={{ position: "relative", my: 3 }}>
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: 0,
+                        right: 0,
+                        height: "1px",
+                        background: "rgba(255, 255, 255, 0.2)",
+                      }}
+                    />
+                    <Typography
+                      align="center"
+                      variant="body2"
+                      sx={{
+                        background: "rgba(30, 41, 59, 0.9)",
+                        px: 2,
+                        color: "rgba(255, 255, 255, 0.7)",
+                        position: "relative",
+                        display: "inline-block",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                      }}
+                    >
+                      OR
+                    </Typography>
+                  </Box>
+
+                  <Box component="form" noValidate onSubmit={handleSubmit}>
+                    <TextField
+                      margin="normal"
+                      required
+                      fullWidth
+                      id="name"
+                      label="Your first name"
+                      name="name"
+                      autoComplete="given-name"
+                      autoFocus
+                      variant="outlined"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      sx={{ mb: 2 }}
+                    />
+                    <TextField
+                      margin="normal"
+                      required
+                      fullWidth
+                      id="surname"
+                      label="Your last name"
+                      name="surname"
+                      autoComplete="family-name"
+                      variant="outlined"
+                      value={formData.surname}
+                      onChange={handleInputChange}
+                      sx={{ mb: 2 }}
+                    />
+                    <TextField
+                      margin="normal"
+                      required
+                      fullWidth
+                      id="email"
+                      label="Your email address"
+                      name="email"
+                      autoComplete="email"
+                      variant="outlined"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      sx={{ mb: 2 }}
+                    />
+                    <TextField
+                      margin="normal"
+                      required
+                      fullWidth
+                      name="password"
+                      label="Your password"
+                      type="password"
+                      id="password"
+                      autoComplete="current-password"
+                      variant="outlined"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      sx={{ mb: 3 }}
+                    />
+                    <Button
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      sx={{
+                        mt: 2,
+                        mb: 3,
+                        py: 1.5,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Create Account
+                    </Button>
+                    <Typography variant="body2" align="center" color="text.secondary">
+                      Already have an account?{" "}
+                      <Link
+                        href="/signin"
+                        variant="body2"
+                        sx={{
+                          color: "#3b82f6",
+                          textDecoration: "none",
+                          fontWeight: 600,
+                          "&:hover": { textDecoration: "underline" },
+                        }}
+                      >
+                        Sign in
+                      </Link>
+                    </Typography>
+                  </Box>
+                </Paper>
+              </Fade>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
     </ThemeProvider>
   );
 };

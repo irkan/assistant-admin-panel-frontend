@@ -26,6 +26,10 @@ import {
   Backdrop,
   Chip,
   Divider,
+  Container,
+  Fade,
+  Avatar,
+  Paper,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -35,9 +39,12 @@ import {
   Delete as DeleteIcon,
   Close as CloseIcon,
   Key as KeyIcon,
-
+  VpnKey,
+  Security,
+  Lock,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
+import "../../styles/modern-theme.css";
 
 interface ApiKey {
   id: string;
@@ -489,41 +496,114 @@ export const ApiKeyList: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Grid container spacing={4}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "url('/assets/backgrounds/gradient-bg.svg') no-repeat center center",
+        backgroundSize: "cover",
+        position: "relative",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(135deg, rgba(15,23,42,0.88) 0%, rgba(30,41,59,0.95) 100%)",
+        },
+      }}
+    >
+      <Box className="bg-pattern-dots" sx={{ position: "absolute", inset: 0, opacity: 0.08 }} />
+      
+      <Container maxWidth="xl" sx={{ position: "relative", zIndex: 2, pt: 4, pb: 6 }}>
+        {/* Header Section */}
+        <Fade in timeout={600}>
+          <Box sx={{ mb: 6 }}>
+            <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+              <Avatar
+                sx={{
+                  width: 48,
+                  height: 48,
+                  background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                  boxShadow: "var(--shadow-glow)",
+                }}
+              >
+                <VpnKey sx={{ fontSize: 24 }} />
+              </Avatar>
+              <Box>
+                <Typography 
+                  variant="h3" 
+                  sx={{ 
+                    fontWeight: 800,
+                    background: "linear-gradient(135deg, #ffffff 0%, #f093fb 100%)",
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    mb: 0.5,
+                  }}
+                >
+                  API Keys
+                </Typography>
+                <Typography variant="body1" sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+                  Manage your private and public API keys for secure integrations
+                </Typography>
+              </Box>
+            </Stack>
+          </Box>
+        </Fade>
+
+        <Grid container spacing={4}>
         {/* Private API Keys Section */}
         <Grid item xs={12}>
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            mb: 2,
-          }}>
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
-                Private API Keys
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Use these keys for interacting with our APIs in your backend systems.
-              </Typography>
-            </Box>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => handleCreateClick('private')}
-              sx={{
-                backgroundColor: '#10b981',
-                '&:hover': {
-                  backgroundColor: '#059669',
-                },
-                textTransform: 'none',
-                fontWeight: 600,
-                px: 3,
-              }}
+          <Fade in timeout={800}>
+            <Paper
+              className="modern-card-dark"
+              sx={{ p: 4, mb: 2 }}
             >
-              Add Key
-            </Button>
-          </Box>
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                mb: 3,
+              }}>
+                <Box>
+                  <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+                    <Avatar
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                      }}
+                    >
+                      <Lock sx={{ fontSize: 18 }} />
+                    </Avatar>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: "white" }}>
+                      Private API Keys
+                    </Typography>
+                  </Stack>
+                  <Typography variant="body2" sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+                    Use these keys for interacting with our APIs in your backend systems.
+                  </Typography>
+                </Box>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => handleCreateClick('private')}
+                  sx={{
+                    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                    textTransform: "none",
+                    borderRadius: "12px",
+                    fontWeight: 600,
+                    px: 3,
+                    py: 1.5,
+                    boxShadow: "0 4px 16px rgba(16, 185, 129, 0.3)",
+                    "&:hover": {
+                      background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 8px 24px rgba(16, 185, 129, 0.4)",
+                    },
+                  }}
+                >
+                  Add Key
+                </Button>
+              </Box>
           
           <Box>
             {privateKeys.map((apiKey) => (
@@ -537,55 +617,78 @@ export const ApiKeyList: React.FC = () => {
             ))}
             {privateKeys.length === 0 && (
               <Card sx={{ 
-                border: '2px dashed',
-                borderColor: theme.palette.divider,
-                backgroundColor: 'transparent',
+                border: '2px dashed rgba(255, 255, 255, 0.2)',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
                 textAlign: 'center',
                 py: 4,
+                borderRadius: 2,
               }}>
-                <Typography color="text.secondary">
+                <Typography sx={{ color: "rgba(255, 255, 255, 0.6)" }}>
                   No private API keys yet
                 </Typography>
               </Card>
             )}
           </Box>
+            </Paper>
+          </Fade>
         </Grid>
 
         {/* Public API Keys Section */}
         <Grid item xs={12}>
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            mb: 2,
-          }}>
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
-                Public API Keys
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Use these keys for interacting with Vapi Client SDKs (e.g. from your frontend).
-              </Typography>
-            </Box>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => handleCreateClick('public')}
-              sx={{
-                backgroundColor: '#10b981',
-                '&:hover': {
-                  backgroundColor: '#059669',
-                },
-                textTransform: 'none',
-                fontWeight: 600,
-                px: 3,
-              }}
+          <Fade in timeout={1000}>
+            <Paper
+              className="modern-card-dark"
+              sx={{ p: 4 }}
             >
-              Add Key
-            </Button>
-          </Box>
-          
-          <Box>
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                mb: 3,
+              }}>
+                <Box>
+                  <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+                    <Avatar
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                      }}
+                    >
+                      <Security sx={{ fontSize: 18 }} />
+                    </Avatar>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: "white" }}>
+                      Public API Keys
+                    </Typography>
+                  </Stack>
+                  <Typography variant="body2" sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+                    Use these keys for interacting with our APIs in your frontend applications.
+                  </Typography>
+                </Box>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => handleCreateClick('public')}
+                  sx={{
+                    background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                    textTransform: "none",
+                    borderRadius: "12px",
+                    fontWeight: 600,
+                    px: 3,
+                    py: 1.5,
+                    boxShadow: "0 4px 16px rgba(59, 130, 246, 0.3)",
+                    "&:hover": {
+                      background: "linear-gradient(135deg, #2563eb 0%, #1e40af 100%)",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 8px 24px rgba(59, 130, 246, 0.4)",
+                    },
+                  }}
+                >
+                  Add Key
+                </Button>
+              </Box>
+              
+              <Box>
             {publicKeys.map((apiKey) => (
               <ApiKeyCard
                 key={apiKey.id}
@@ -597,18 +700,20 @@ export const ApiKeyList: React.FC = () => {
             ))}
             {publicKeys.length === 0 && (
               <Card sx={{ 
-                border: '2px dashed',
-                borderColor: theme.palette.divider,
-                backgroundColor: 'transparent',
+                border: '2px dashed rgba(255, 255, 255, 0.2)',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
                 textAlign: 'center',
                 py: 4,
+                borderRadius: 2,
               }}>
-                <Typography color="text.secondary">
+                <Typography sx={{ color: "rgba(255, 255, 255, 0.6)" }}>
                   No public API keys yet
                 </Typography>
               </Card>
             )}
           </Box>
+            </Paper>
+          </Fade>
         </Grid>
       </Grid>
 
@@ -618,6 +723,7 @@ export const ApiKeyList: React.FC = () => {
         type={modalType}
         onSuccess={handleCreateSuccess}
       />
+      </Container>
     </Box>
   );
 };

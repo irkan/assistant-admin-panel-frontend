@@ -8,10 +8,22 @@ import {
   BooleanField,
 } from "@refinedev/mui";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Box, Button } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { 
+  Box, 
+  Button, 
+  Container,
+  Fade,
+  Avatar,
+  Typography,
+  Stack,
+  Card,
+  alpha,
+  useTheme,
+} from "@mui/material";
+import { Add, Business, Group } from "@mui/icons-material";
 import { useNavigate } from "react-router";
 import dayjs from "dayjs";
+import "../../styles/modern-theme.css";
 
 export const OrganizationList: React.FC = () => {
   const navigate = useNavigate();
