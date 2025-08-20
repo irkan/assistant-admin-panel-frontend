@@ -65,6 +65,7 @@ import providersData from "../../data/providers.json";
 
 interface Agent {
   id: number;
+  uuid?: string; // Add UUID field
   name: string;
   organizationId: number;
   organization?: {
@@ -128,8 +129,8 @@ export const AssistantList: React.FC = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [temperature, setTemperature] = useState(0.7);
-  const [selectedProvider, setSelectedProvider] = useState("azure-openai");
-  const [selectedModel, setSelectedModel] = useState("gpt-4o-2024-11-20");
+  const [selectedProvider, setSelectedProvider] = useState("google");
+  const [selectedModel, setSelectedModel] = useState("gemini-2.0-flash-001");
   const [userPrompt, setUserPrompt] = useState("");
   const [selectedVoice, setSelectedVoice] = useState("zephyr");
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
@@ -141,6 +142,8 @@ export const AssistantList: React.FC = () => {
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false);
   const [firstMessage, setFirstMessage] = useState("");
   const [interactionMode, setInteractionMode] = useState("assistant_speak_first");
+  const [originalData, setOriginalData] = useState<any>(null); // Track original data for change detection
+  const [hasChanges, setHasChanges] = useState(false);
 
   const { data, isLoading, refetch } = useList<Agent>({
     resource: "assistants",
@@ -160,9 +163,9 @@ export const AssistantList: React.FC = () => {
       setUserPrompt(selectedAgent.details?.userPrompt || "");
       setInteractionMode(selectedAgent.details?.interactionMode || "assistant_speak_first");
       
-      // Set provider and model
-      setSelectedProvider(selectedAgent.details?.provider || "azure-openai");
-      setSelectedModel(selectedAgent.details?.model || "gpt-4o-2024-11-20");
+      // Set provider and model (always Google now)
+      setSelectedProvider("google");
+      setSelectedModel(selectedAgent.details?.model || "gemini-2.0-flash-001");
       
       // Set voice settings
       setSelectedVoice(selectedAgent.details?.selectedVoice || "zephyr");
@@ -174,10 +177,55 @@ export const AssistantList: React.FC = () => {
       
       // Set tools from agent data or empty array
       setSelectedTools(selectedAgent.tools?.map(tool => tool.toolId) || []);
+      
+      // Store original data for change detection
+      setOriginalData({
+        firstMessage: selectedAgent.details?.firstMessage || "Hello.",
+        userPrompt: selectedAgent.details?.userPrompt || "",
+        interactionMode: selectedAgent.details?.interactionMode || "assistant_speak_first",
+        provider: selectedAgent.details?.provider || "azure-openai",
+        model: selectedAgent.details?.model || "gpt-4o-2024-11-20",
+        selectedVoice: selectedAgent.details?.selectedVoice || "zephyr",
+        temperature: selectedAgent.details?.temperature ?? 0.7,
+        silenceTimeout: selectedAgent.details?.silenceTimeout ?? 30,
+        maximumDuration: selectedAgent.details?.maximumDuration ?? 600,
+        tools: selectedAgent.tools?.map(tool => tool.toolId) || []
+      });
+      
+      // Reset change detection
+      setHasChanges(false);
     }
   }, [selectedAgent]);
 
   const agents = (data?.data || []) as Agent[];
+
+  // Function to detect changes
+  const detectChanges = () => {
+    if (!originalData) return false;
+    
+    const currentData = {
+      firstMessage,
+      userPrompt,
+      interactionMode,
+                provider: "google",
+      model: selectedModel,
+      selectedVoice,
+      temperature,
+      silenceTimeout,
+      maximumDuration,
+      tools: selectedTools
+    };
+    
+    return JSON.stringify(currentData) !== JSON.stringify(originalData);
+  };
+
+  // Watch for changes in form values
+  useEffect(() => {
+    if (originalData) {
+      const changesDetected = detectChanges();
+      setHasChanges(changesDetected);
+    }
+  }, [firstMessage, userPrompt, interactionMode, selectedProvider, selectedModel, selectedVoice, temperature, silenceTimeout, maximumDuration, selectedTools, originalData]);
 
   // Filter agents based on search
   const filteredAgents = agents.filter((agent) => {
@@ -209,9 +257,9 @@ export const AssistantList: React.FC = () => {
     setUserPrompt(agent.details?.userPrompt || "");
     setInteractionMode(agent.details?.interactionMode || "assistant_speak_first");
     
-    // Set provider and model
-    setSelectedProvider(agent.details?.provider || "azure-openai");
-    setSelectedModel(agent.details?.model || "gpt-4o-2024-11-20");
+    // Set provider and model (always Google now)
+    setSelectedProvider("google");
+    setSelectedModel(agent.details?.model || "gemini-2.0-flash-001");
     
     // Set voice settings
     setSelectedVoice(agent.details?.selectedVoice || "zephyr");
@@ -240,7 +288,7 @@ export const AssistantList: React.FC = () => {
         userPrompt: userPrompt,
         systemPrompt: selectedAgent.details?.systemPrompt || "This is a blank template with minimal defaults, you can change the model, temperature, and messages.",
         interactionMode: interactionMode,
-        provider: selectedProvider,
+        provider: "google",
         model: selectedModel,
         selectedVoice: selectedVoice,
         temperature: temperature,
@@ -268,6 +316,21 @@ export const AssistantList: React.FC = () => {
         refetch();
         // Update local state
         setSelectedAgent({ ...selectedAgent, status: 'published' });
+        // Reset change detection after successful publish
+        setHasChanges(false);
+        // Update original data to current values
+        setOriginalData({
+          firstMessage,
+          userPrompt,
+          interactionMode,
+          provider: "google",
+          model: selectedModel,
+          selectedVoice,
+          temperature,
+          silenceTimeout,
+          maximumDuration,
+          tools: selectedTools
+        });
       } else {
         console.error('Publish failed:', data.message);
       }
@@ -288,6 +351,19 @@ export const AssistantList: React.FC = () => {
   const getVoicesForProvider = (providerId: string) => {
     const provider = providersData.providers.find(p => p.id === providerId);
     return provider?.voices || [];
+  };
+
+  // Get voice name by voice ID
+  const getVoiceNameById = (voiceId: string) => {
+    for (const provider of providersData.providers) {
+      if (provider.voices) {
+        const voice = provider.voices.find(v => v.id === voiceId);
+        if (voice) {
+          return voice.name;
+        }
+      }
+    }
+    return voiceId; // fallback to ID if name not found
   };
 
   // Get all available tools from toolTypes data
@@ -427,13 +503,21 @@ export const AssistantList: React.FC = () => {
                       {agent.name}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {agent.details?.model || "Elliot"}
+                      {agent.uuid || `assistant-${agent.id}`}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                      {agent.details?.selectedVoice ? getVoiceNameById(agent.details.selectedVoice) : "Zephyr"}
                     </Typography>
                   </Box>
                   <Circle
                     sx={{
                       fontSize: 12,
-                      color: agent.status === 'published' 
+                      color: 
+                        // If this is the selected agent and has changes, show orange
+                        (selectedAgent?.id === agent.id && hasChanges) 
+                        ? '#ff9800' 
+                        // Otherwise show based on status
+                        : agent.status === 'published' 
                         ? theme.palette.success.main
                         : '#ff9800', // Orange for draft
                     }}
@@ -463,7 +547,10 @@ export const AssistantList: React.FC = () => {
                     {selectedAgent.name}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {selectedAgent.details?.agentId || `8b4bfa09-eb6e-416b-ab60-a3673512b225#llm-model`}
+                    {selectedAgent.uuid || `assistant-${selectedAgent.id}`}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem', mt: 0.5 }}>
+                    Voice: {selectedAgent.details?.selectedVoice ? getVoiceNameById(selectedAgent.details.selectedVoice) : "Zephyr"}
                   </Typography>
                 </Box>
                 <Stack direction="row" spacing={1}>
@@ -482,23 +569,21 @@ export const AssistantList: React.FC = () => {
                   >
                     Chat
                   </Button>
-                  {selectedAgent?.status !== 'published' && (
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={handlePublish}
-                      disabled={isPublishing}
-                      sx={{ 
-                        textTransform: "none",
-                        backgroundColor: theme.palette.success.main,
-                        '&:hover': {
-                          backgroundColor: theme.palette.success.dark,
-                        }
-                      }}
-                    >
-                      {isPublishing ? "Publishing..." : "Publish"}
-                    </Button>
-                  )}
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={handlePublish}
+                    disabled={isPublishing}
+                    sx={{ 
+                      textTransform: "none",
+                      backgroundColor: theme.palette.success.main,
+                      '&:hover': {
+                        backgroundColor: theme.palette.success.dark,
+                      }
+                    }}
+                  >
+                    {isPublishing ? "Publishing..." : "Publish"}
+                  </Button>
                   <IconButton 
                     size="small"
                     onClick={(event) => setMenuAnchorEl(event.currentTarget)}
@@ -777,22 +862,22 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
                     <FormControl fullWidth>
                       <InputLabel>Provider</InputLabel>
                       <Select
-                        value={selectedProvider}
+                        value="google"
                         label="Provider"
-                        onChange={(e) => {
-                          setSelectedProvider(e.target.value);
-                          // Reset model selection when provider changes
-                          const models = getModelsForProvider(e.target.value);
-                          if (models.length > 0) {
-                            setSelectedModel(models[0].id);
+                        disabled={true}
+                        sx={{
+                          bgcolor: 'rgba(0, 0, 0, 0.04)',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(0, 0, 0, 0.15)',
+                          },
+                          '& .MuiSelect-select': {
+                            color: 'rgba(0, 0, 0, 0.6)',
                           }
                         }}
                       >
-                        {providersData.providers.map((provider) => (
-                          <MenuItem key={provider.id} value={provider.id}>
-                            {provider.name}
-                          </MenuItem>
-                        ))}
+                        <MenuItem value="google">
+                          Google
+                        </MenuItem>
                       </Select>
                     </FormControl>
 
@@ -803,7 +888,7 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
                         label="Model"
                         onChange={(e) => setSelectedModel(e.target.value)}
                       >
-                        {getModelsForProvider(selectedProvider).map((model) => (
+                        {getModelsForProvider("google").map((model) => (
                           <MenuItem key={model.id} value={model.id}>
                             <Box>
                               <Typography variant="body2">
@@ -850,7 +935,7 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
                             pr: 1,
                           }}
                         >
-                          {getVoicesForProvider(selectedProvider).map((voice) => (
+                          {getVoicesForProvider("google").map((voice) => (
                             <Card
                               key={voice.id}
                               onClick={() => setSelectedVoice(voice.id)}

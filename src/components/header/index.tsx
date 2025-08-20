@@ -1,7 +1,9 @@
 import DarkModeOutlined from "@mui/icons-material/DarkModeOutlined";
 import LightModeOutlined from "@mui/icons-material/LightModeOutlined";
+import { Key } from "@mui/icons-material";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Toolbar from "@mui/material/Toolbar";
@@ -33,6 +35,10 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
   });
   
   const currentOrganization = organizationsData?.data?.[0];
+  
+  const handleGetApiKeyClick = () => {
+    navigate('/api-keys');
+  };
 
   return (
     <AppBar position={sticky ? "sticky" : "relative"}>
@@ -102,6 +108,31 @@ export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = ({
             alignItems="center"
             justifyContent="flex-end"
           >
+            {/* Get API Key Button */}
+            <Button
+              variant="outlined"
+              startIcon={<Key />}
+              onClick={handleGetApiKeyClick}
+              size="small"
+              sx={{
+                borderRadius: '20px',
+                textTransform: 'none',
+                px: 2,
+                py: 0.5,
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                color: 'white',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  borderColor: 'rgba(255, 255, 255, 0.5)',
+                },
+              }}
+            >
+              Get API key
+            </Button>
+            
             <IconButton
               color="inherit"
               onClick={() => {

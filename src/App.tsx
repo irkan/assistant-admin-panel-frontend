@@ -52,7 +52,7 @@ import {
 import { Dashboard } from "./pages/dashboard";
 import { AppIcon } from "./components/app-icon";
 import { ColorModeContextProvider } from "./contexts/color-mode";
-import { Header } from "./components/header";
+import { Header, Sider } from "./components";
 import { Signin } from "./pages/signin";
 import { Signup } from "./pages/signup";
 import { ForgotPassword } from "./pages/forgotPassword";
@@ -110,6 +110,15 @@ function App() {
                   routerProvider={routerBindings}
                   resources={[
                     {
+                      name: "dashboard",
+                      list: "/dashboard",
+                      meta: {
+                        canDelete: false,
+                        icon: <span>📊</span>,
+                        label: "Dashboard",
+                      },
+                    },
+                    {
                       name: "organizations",
                       show: "/organizations/show/:id",
                       edit: "/organizations/edit/:id",
@@ -142,18 +151,7 @@ function App() {
                         label: "Tools",
                       },
                     },
-                    {
-                      name: "api-keys",
-                      list: "/api-keys",
-                      create: "/api-keys/create",
-                      edit: "/api-keys/edit/:id",
-                      show: "/api-keys/show/:id",
-                      meta: {
-                        canDelete: true,
-                        icon: <span>🔑</span>,
-                        label: "API Keys",
-                      },
-                    },
+
                   ]}
                   options={{
                     syncWithLocation: true,
@@ -170,7 +168,7 @@ function App() {
                           key="authenticated-inner"
                           fallback={<CatchAllNavigate to="/signin" />}
                         >
-                          <ThemedLayoutV2 Header={Header}>
+                          <ThemedLayoutV2 Header={Header} Sider={Sider}>
                             <Outlet />
                           </ThemedLayoutV2>
                         </Authenticated>

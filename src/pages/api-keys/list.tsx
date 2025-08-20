@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useList, useCreate } from "@refinedev/core";
+
 import {
   Box,
   Card,
@@ -34,6 +35,7 @@ import {
   Delete as DeleteIcon,
   Close as CloseIcon,
   Key as KeyIcon,
+
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 
@@ -68,12 +70,12 @@ const CreateApiKeyModal: React.FC<{
   const { mutate: create, isLoading } = useCreate();
 
   // Get assistants from backend
-  const { data: assistantsData, isLoading: assistantsLoading } = useList({
+  const { data: assistantsData, isLoading: assistantsLoading } = useList<{id: number, name: string}>({
     resource: 'assistants',
     pagination: { mode: 'off' },
   });
 
-  const assistants: Assistant[] = assistantsData?.data?.map((assistant: any) => ({
+  const assistants: Assistant[] = assistantsData?.data?.map((assistant) => ({
     id: assistant.id.toString(),
     name: assistant.name,
   })) || [];
@@ -447,16 +449,16 @@ export const ApiKeyList: React.FC = () => {
     },
   ];
 
-  const { data, refetch } = useList({
+  const { data, refetch } = useList<ApiKey>({
     resource: 'api-keys',
     pagination: { mode: 'off' },
   });
 
   // Use mock data if no real data
-  const apiKeys = data?.data?.length ? data.data : mockApiKeys;
+  const apiKeys: ApiKey[] = data?.data?.length ? data.data : mockApiKeys;
 
-  const privateKeys = apiKeys.filter(key => key.type === 'private');
-  const publicKeys = apiKeys.filter(key => key.type === 'public');
+  const privateKeys: ApiKey[] = apiKeys.filter(key => key.type === 'private');
+  const publicKeys: ApiKey[] = apiKeys.filter(key => key.type === 'public');
 
   const handleCreateClick = (type: 'private' | 'public') => {
     setModalType(type);
