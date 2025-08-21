@@ -3,6 +3,13 @@ import {
   Authenticated,
   useList,
 } from "@refinedev/core";
+import {
+  Dashboard as DashboardIcon,
+  SmartToy,
+  Build,
+  Business,
+  VolumeUp,
+} from "@mui/icons-material";
 import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -43,6 +50,9 @@ import {
   ToolEdit,
   ToolShow,
 } from "./pages/tools";
+import {
+  VoiceLibraryList,
+} from "./pages/voice-library";
 import {
   ApiKeyList,
   ApiKeyCreate,
@@ -114,7 +124,7 @@ function App() {
                       list: "/dashboard",
                       meta: {
                         canDelete: false,
-                        icon: <span>📊</span>,
+                        icon: <DashboardIcon />,
                         label: "Dashboard",
                       },
                     },
@@ -124,7 +134,7 @@ function App() {
                       edit: "/organizations/edit/:id",
                       meta: {
                         canDelete: false,
-                        icon: <span>🏢</span>,
+                        icon: <Business />,
                         hide: true, // Hide from sidebar
                       },
                     },
@@ -135,7 +145,7 @@ function App() {
                       show: "/assistants/show/:id",
                       meta: {
                         canDelete: true,
-                        icon: <span>🤖</span>,
+                        icon: <SmartToy />,
                         label: "Assistants",
                       },
                     },
@@ -147,8 +157,17 @@ function App() {
                       show: "/tools/show/:id",
                       meta: {
                         canDelete: true,
-                        icon: <span>🔧</span>,
+                        icon: <Build />,
                         label: "Tools",
+                      },
+                    },
+                    {
+                      name: "voice-library",
+                      list: "/voice-library",
+                      meta: {
+                        canDelete: false,
+                        icon: <VolumeUp />,
+                        label: "Voice Library",
                       },
                     },
 
@@ -197,6 +216,9 @@ function App() {
                         <Route path="create" element={<ToolCreate />} />
                         <Route path="edit/:id" element={<ToolEdit />} />
                         <Route path="show/:id" element={<ToolShow />} />
+                      </Route>
+                      <Route path="/voice-library">
+                        <Route index element={<VoiceLibraryList />} />
                       </Route>
                       <Route path="/api-keys">
                         <Route index element={<ApiKeyList />} />

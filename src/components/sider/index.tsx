@@ -20,6 +20,10 @@ import {
   ExpandMore,
   ChevronLeft,
   ChevronRight,
+  Dashboard as DashboardIcon,
+  SmartToy,
+  Build,
+  Business,
 } from "@mui/icons-material";
 import {
   Box,
@@ -208,7 +212,7 @@ export const Sider: React.FC<SiderProps> = ({
               color: (selectedKey === "/" || selectedKey === "/dashboard") ? "primary.main" : "text.primary",
             }}
           >
-            📊
+            <DashboardIcon />
           </ListItemIcon>
           {!collapsed && (
             <ListItemText

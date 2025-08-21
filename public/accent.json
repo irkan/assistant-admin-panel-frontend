@@ -1,0 +1,456 @@
+[
+    {},
+    {
+        "accent": "english-italian"
+    },
+    {
+        "accent": "african"
+    },
+    {
+        "accent": "indian "
+    },
+    {
+        "accent": "flemish"
+    },
+    {
+        "accent": "colombian"
+    },
+    {
+        "accent": "indian"
+    },
+    {
+        "accent": "sundanese"
+    },
+    {
+        "accent": "québec"
+    },
+    {
+        "accent": "fr-parisian"
+    },
+    {
+        "accent": "gulf"
+    },
+    {
+        "accent": "american-southern"
+    },
+    {
+        "accent": "russian"
+    },
+    {
+        "accent": "turkish"
+    },
+    {
+        "accent": "japanese"
+    },
+    {
+        "accent": "belgian"
+    },
+    {
+        "accent": "kanto"
+    },
+    {
+        "accent": "es-mexican"
+    },
+    {
+        "accent": "en-indian"
+    },
+    {
+        "accent": "hu-budapest"
+    },
+    {
+        "accent": "czech"
+    },
+    {
+        "accent": "new zealand"
+    },
+    {
+        "accent": "malaysian"
+    },
+    {
+        "accent": "zagreb"
+    },
+    {
+        "accent": "asian"
+    },
+    {
+        "accent": "zealandic"
+    },
+    {
+        "accent": "brazilian"
+    },
+    {
+        "accent": "standard"
+    },
+    {
+        "accent": "tamil"
+    },
+    {
+        "accent": "oslo"
+    },
+    {
+        "accent": "african american"
+    },
+    {
+        "accent": "stockholm"
+    },
+    {
+        "accent": "venezuelan"
+    },
+    {
+        "accent": "it-venetian"
+    },
+    {
+        "accent": "british "
+    },
+    {
+        "accent": "moscow"
+    },
+    {
+        "accent": "istanbul"
+    },
+    {
+        "accent": "dutch"
+    },
+    {
+        "accent": "helsinki"
+    },
+    {
+        "accent": ""
+    },
+    {
+        "accent": "modern standard"
+    },
+    {
+        "accent": "australian"
+    },
+    {
+        "accent": "bulgarian"
+    },
+    {
+        "accent": "singapore mandarin"
+    },
+    {
+        "accent": "german"
+    },
+    {
+        "accent": "french"
+    },
+    {
+        "accent": "ar-egyptian"
+    },
+    {
+        "accent": "polish"
+    },
+    {
+        "accent": "american german"
+    },
+    {
+        "accent": "us southern"
+    },
+    {
+        "accent": "moravian"
+    },
+    {
+        "accent": "arabic"
+    },
+    {
+        "accent": "latin american"
+    },
+    {
+        "accent": "en-american"
+    },
+    {
+        "accent": "hr-standard"
+    },
+    {
+        "accent": "southern"
+    },
+    {
+        "accent": "andalusian"
+    },
+    {
+        "accent": "english-swedish"
+    },
+    {
+        "accent": "es-canary-islands"
+    },
+    {
+        "accent": "chinese"
+    },
+    {
+        "accent": "pt-brazilian"
+    },
+    {
+        "accent": "kuwaiti"
+    },
+    {
+        "accent": "hungarian"
+    },
+    {
+        "accent": "saint petersburg"
+    },
+    {
+        "accent": "jamaican"
+    },
+    {
+        "accent": "aegean"
+    },
+    {
+        "accent": "european"
+    },
+    {
+        "accent": "canadian"
+    },
+    {
+        "accent": "swedish"
+    },
+    {
+        "accent": "hindi"
+    },
+    {
+        "accent": "it-standard"
+    },
+    {
+        "accent": "saudi"
+    },
+    {
+        "accent": "argentine"
+    },
+    {
+        "accent": "jordanian"
+    },
+    {
+        "accent": "slovak"
+    },
+    {
+        "accent": "es-latin-american"
+    },
+    {
+        "accent": "anatolian"
+    },
+    {
+        "accent": "scottish"
+    },
+    {
+        "accent": "egyptian"
+    },
+    {
+        "accent": "de-standard"
+    },
+    {
+        "accent": "es-peruvian"
+    },
+    {
+        "accent": "british-essex"
+    },
+    {
+        "accent": "kiev"
+    },
+    {
+        "accent": "athenian"
+    },
+    {
+        "accent": "prague"
+    },
+    {
+        "accent": "irish"
+    },
+    {
+        "accent": "taiwan mandarin"
+    },
+    {
+        "accent": "danish"
+    },
+    {
+        "accent": "portuguese"
+    },
+    {
+        "accent": "mazovian"
+    },
+    {
+        "accent": "balinese"
+    },
+    {
+        "accent": "filipino"
+    },
+    {
+        "accent": "moroccan"
+    },
+    {
+        "accent": "american-irish"
+    },
+    {
+        "accent": "sofia"
+    },
+    {
+        "accent": "seoul"
+    },
+    {
+        "accent": "chilean"
+    },
+    {
+        "accent": "castillian"
+    },
+    {
+        "accent": "peninsular"
+    },
+    {
+        "accent": "south african"
+    },
+    {
+        "accent": "peruvian"
+    },
+    {
+        "accent": "jutlandic"
+    },
+    {
+        "accent": "berlinerisch"
+    },
+    {
+        "accent": "eastern european"
+    },
+    {
+        "accent": "italian"
+    },
+    {
+        "accent": "beijing mandarin"
+    },
+    {
+        "accent": "bergen"
+    },
+    {
+        "accent": "european portuguese"
+    },
+    {
+        "accent": "bavarian"
+    },
+    {
+        "accent": "cebuano"
+    },
+    {
+        "accent": "meridional"
+    },
+    {
+        "accent": "swiss"
+    },
+    {
+        "accent": "nigerian"
+    },
+    {
+        "accent": "british"
+    },
+    {
+        "accent": "saxon"
+    },
+    {
+        "accent": "mexican"
+    },
+    {
+        "accent": "gujarati"
+    },
+    {
+        "accent": "american"
+    },
+    {
+        "accent": "central"
+    },
+    {
+        "accent": "en-canadian"
+    },
+    {
+        "accent": "brabantian"
+    },
+    {
+        "accent": "vi-standard"
+    },
+    {
+        "accent": "us northeast"
+    },
+    {
+        "accent": "ru-standard"
+    },
+    {
+        "accent": "us midwest"
+    },
+    {
+        "accent": "romanian"
+    },
+    {
+        "accent": "milanese"
+    },
+    {
+        "accent": "zh-beijing-mandarin"
+    },
+    {
+        "accent": "bihari"
+    },
+    {
+        "accent": "haryanvi"
+    },
+    {
+        "accent": "sicilian"
+    },
+    {
+        "accent": "parisian"
+    },
+    {
+        "accent": "pl-standard"
+    },
+    {
+        "accent": "northern"
+    },
+    {
+        "accent": "macedonian"
+    },
+    {
+        "accent": "neapolitan"
+    },
+    {
+        "accent": "varna"
+    },
+    {
+        "accent": "received pronunciation"
+    },
+    {
+        "accent": "singaporean"
+    },
+    {
+        "accent": "spanish"
+    },
+    {
+        "accent": "en-australian"
+    },
+    {
+        "accent": "levantine"
+    },
+    {
+        "accent": "bengali"
+    },
+    {
+        "accent": "new york"
+    },
+    {
+        "accent": "punjabi"
+    },
+    {
+        "accent": "malay"
+    },
+    {
+        "accent": "quebec"
+    },
+    {
+        "accent": "transylvanian"
+    },
+    {
+        "accent": "hi-standard"
+    },
+    {
+        "accent": "en-british"
+    },
+    {
+        "accent": "javanese"
+    },
+    {
+        "accent": "indonesian"
+    }
+]

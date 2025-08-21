@@ -387,6 +387,87 @@ export const AssistantList: React.FC = () => {
     });
   };
 
+  // Handle duplicate assistant
+  const handleDuplicate = async () => {
+    if (!selectedAgent) return;
+
+    try {
+      setIsPublishing(true);
+      
+      // Generate new UUID (fallback for older browsers)
+      const newUuid = crypto?.randomUUID ? crypto.randomUUID() : 
+        'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      
+      // Prepare duplicate data with new name and UUID
+      const timestamp = Date.now();
+      const randomSuffix = Math.floor(Math.random() * 100);
+      
+      const duplicateData = {
+        name: `${selectedAgent.name} Copy ${timestamp.toString().slice(-6)}${randomSuffix}`,
+        organizationId: selectedAgent.organizationId || selectedAgent.organization?.id,
+        active: selectedAgent.active,
+        details: {
+          firstMessage: selectedAgent.details?.firstMessage || firstMessage,
+          userPrompt: selectedAgent.details?.userPrompt || userPrompt,
+          systemPrompt: selectedAgent.details?.systemPrompt || "This is a blank template with minimal defaults, you can change the model, temperature, and messages.",
+          interactionMode: selectedAgent.details?.interactionMode || interactionMode,
+          provider: selectedAgent.details?.provider || "google",
+          model: selectedAgent.details?.model || selectedModel,
+          selectedVoice: selectedAgent.details?.selectedVoice || selectedVoice,
+          temperature: selectedAgent.details?.temperature || temperature,
+          silenceTimeout: selectedAgent.details?.silenceTimeout || silenceTimeout,
+          maximumDuration: selectedAgent.details?.maximumDuration || maximumDuration,
+        },
+        tools: selectedAgent.tools || selectedTools || []
+      };
+
+      console.log('Duplicating assistant:', duplicateData);
+
+      // Create new assistant
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3003'}/api/assistants`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('refine-auth')}`
+        },
+        body: JSON.stringify(duplicateData)
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('Assistant duplicated successfully');
+        // Immediately publish the duplicated assistant
+        const publishResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3003'}/api/assistants/${result.data.id}/publish`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('refine-auth')}`
+          },
+          body: JSON.stringify(duplicateData)
+        });
+
+        const publishResult = await publishResponse.json();
+        
+        if (publishResult.success) {
+          console.log('Duplicated assistant published successfully');
+          refetch(); // Refresh the list
+        } else {
+          console.error('Failed to publish duplicated assistant:', publishResult.message);
+        }
+      } else {
+        console.error('Duplicate failed:', result.message);
+      }
+    } catch (error) {
+      console.error('Duplicate error:', error);
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
   // Get models for selected provider
   const getModelsForProvider = (providerId: string) => {
     const provider = providersData.providers.find(p => p.id === providerId);
@@ -811,7 +892,7 @@ export const AssistantList: React.FC = () => {
                   </MenuItem>
                   <MenuItem onClick={() => {
                     setMenuAnchorEl(null);
-                    // Handle Duplicate
+                    handleDuplicate();
                   }}>
                     <FileCopy sx={{ mr: 1, fontSize: 18 }} />
                     Duplicate
