@@ -159,7 +159,7 @@ export const AssistantList: React.FC = () => {
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
   const [silenceTimeout, setSilenceTimeout] = useState(30);
   const [maximumDuration, setMaximumDuration] = useState(600);
-  const [selectedTools, setSelectedTools] = useState<string[]>([]);
+  const [selectedTools, setSelectedTools] = useState<number[]>([]);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false);
@@ -167,6 +167,8 @@ export const AssistantList: React.FC = () => {
   const [interactionMode, setInteractionMode] = useState("assistant_speak_first");
   const [originalData, setOriginalData] = useState<any>(null); // Track original data for change detection
   const [hasChanges, setHasChanges] = useState(false);
+  const [availableTools, setAvailableTools] = useState<any[]>([]);
+  const [toolsLoading, setToolsLoading] = useState(false);
 
   const { data, isLoading, refetch } = useList<Agent>({
     resource: "assistants",
@@ -295,8 +297,21 @@ export const AssistantList: React.FC = () => {
     setMaximumDuration(agent.details?.maximumDuration ?? 600);
     
     // Set tools from agent data or empty array
-    setSelectedTools(agent.tools?.map(tool => tool.toolId) || []);
+    setSelectedTools(agent.tools?.map(tool => parseInt(tool.toolId)) || []);
+    
+    // Fetch tools for this agent's organization
+    const organizationId = agent.organizationId || agent.organization?.id;
+    if (organizationId) {
+      fetchTools(organizationId);
+    }
   };
+
+  // Auto-select first agent when page loads
+  useEffect(() => {
+    if (filteredAgents.length > 0 && !selectedAgent) {
+      handleAgentSelect(filteredAgents[0]);
+    }
+  }, [filteredAgents, selectedAgent]);
 
     const handlePublish = () => {
     if (!selectedAgent) return;
@@ -493,22 +508,46 @@ export const AssistantList: React.FC = () => {
     return voiceId; // fallback to ID if name not found
   };
 
-  // Get all available tools from toolTypes data
-  const getAllTools = () => {
-    const allTools = [];
-    for (const categoryKey in toolTypesData.categories) {
-      const category = (toolTypesData.categories as any)[categoryKey];
-      if (category.tools) {
-        allTools.push(...category.tools);
+  // Fetch tools from API based on organization
+  const fetchTools = async (organizationId: number) => {
+    if (!organizationId) return;
+    
+    setToolsLoading(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3003'}/api/tools?organizationId=${organizationId}&status=published&active=true`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('refine-auth')}`
+        }
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setAvailableTools(result.data || []);
+      } else {
+        console.error('Failed to fetch tools:', result.message);
+        setAvailableTools([]);
       }
+    } catch (error) {
+      console.error('Error fetching tools:', error);
+      setAvailableTools([]);
+    } finally {
+      setToolsLoading(false);
     }
-    return allTools;
   };
 
-  // Handle tool selection change
+  // Get all available tools (for backward compatibility)
+  const getAllTools = () => {
+    return availableTools;
+  };
+
+  // Handle tool selection change (not used anymore, but keeping for compatibility)
   const handleToolChange = (event: any) => {
     const value = event.target.value;
-    setSelectedTools(typeof value === 'string' ? value.split(',') : value);
+    console.log('🔧 Tool selection changed via Select:', value);
+    // We handle selection via MenuItem onClick now
   };
 
   // Play voice sample
@@ -1359,50 +1398,84 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
                           value={selectedTools}
                           onChange={handleToolChange}
                           input={<OutlinedInput />}
-                          renderValue={() => ''}
+                          renderValue={(selected) => {
+                            console.log('🔧 Selected tools:', selected);
+                            return `${selected.length} tool(s) selected`;
+                          }}
                           displayEmpty
+                          disabled={toolsLoading}
                           sx={{
                             '& .MuiOutlinedInput-root': {
                               backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#fff',
                             },
                           }}
                         >
-                          <MenuItem disabled value="">
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <Search sx={{ fontSize: 16 }} />
-                              <Typography>Search...</Typography>
-                            </Box>
-                          </MenuItem>
-                          
-                          <MenuItem value="">
-                            <Checkbox checked={false} />
-                            <ListItemText primary="(Select All)" />
-                          </MenuItem>
-
-                          {getAllTools().map((tool) => (
-                            <MenuItem key={tool.id} value={tool.id}>
-                              <Checkbox 
-                                checked={selectedTools.indexOf(tool.id) > -1}
-                                sx={{
-                                  '&.Mui-checked': {
-                                    color: '#10b981',
-                                  },
-                                }}
-                              />
-                              <ListItemText 
-                                primary={
-                                  <Box>
-                                    <Typography variant="body2">
-                                      {tool.name.replace('_', ' ')}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                      {tool.id}
-                                    </Typography>
-                                  </Box>
-                                } 
-                              />
+                          {toolsLoading ? (
+                            <MenuItem disabled value="">
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Box sx={{ width: 16, height: 16, border: '2px solid #ccc', borderTop: '2px solid #000', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                                <Typography>Loading tools...</Typography>
+                              </Box>
                             </MenuItem>
-                          ))}
+                          ) : availableTools.length === 0 ? (
+                            <MenuItem disabled value="">
+                              <Typography color="text.secondary">No tools available for this organization</Typography>
+                            </MenuItem>
+                          ) : (
+                            <>
+                              <MenuItem disabled value="">
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <Search sx={{ fontSize: 16 }} />
+                                  <Typography>Search tools...</Typography>
+                                </Box>
+                              </MenuItem>
+                              
+                              <MenuItem value="">
+                                <Checkbox checked={false} />
+                                <ListItemText primary="(Select All)" />
+                              </MenuItem>
+
+                              {getAllTools().map((tool) => {
+                                const isSelected = selectedTools.includes(tool.id);
+                                console.log('🔧 Tool ID:', tool.id, 'Type:', typeof tool.id, 'Selected:', isSelected);
+                                return (
+                                  <MenuItem 
+                                    key={tool.id} 
+                                    value={tool.id}
+                                    onClick={() => {
+                                      console.log('🔧 MenuItem clicked for tool:', tool.id);
+                                      const newSelected = isSelected 
+                                        ? selectedTools.filter(id => id !== tool.id)
+                                        : [...selectedTools, tool.id];
+                                      setSelectedTools(newSelected);
+                                      console.log('🔧 New selected tools:', newSelected);
+                                    }}
+                                  >
+                                    <Checkbox 
+                                      checked={isSelected}
+                                      sx={{
+                                        '&.Mui-checked': {
+                                          color: '#10b981',
+                                        },
+                                      }}
+                                    />
+                                    <ListItemText 
+                                      primary={
+                                        <Box>
+                                          <Typography variant="body2">
+                                            {tool.name}
+                                          </Typography>
+                                          <Typography variant="caption" color="text.secondary">
+                                            {tool.type} • {tool.status}
+                                          </Typography>
+                                        </Box>
+                                      } 
+                                    />
+                                  </MenuItem>
+                                );
+                              })}
+                            </>
+                          )}
                         </Select>
                       </FormControl>
                     </Box>
