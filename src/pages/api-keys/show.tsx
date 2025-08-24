@@ -2,7 +2,7 @@ import React from "react";
 import { useShow } from "@refinedev/core";
 import {
   Show,
-  TextFieldComponent as TextField,
+  TextFieldComponent,
 } from "@refinedev/mui";
 import { Typography, Stack, Chip, Box } from "@mui/material";
 
@@ -15,9 +15,9 @@ export const ApiKeyShow: React.FC = () => {
   return (
     <Show isLoading={isLoading}>
       <Stack spacing={3}>
-        <TextField label="ID" value={record?.id} />
+        <TextFieldComponent value={record?.id} />
         
-        <TextField label="Name" value={record?.name} />
+        <TextFieldComponent value={record?.name} />
         
         <Box>
           <Typography variant="subtitle1" sx={{ mb: 1 }}>
@@ -30,23 +30,28 @@ export const ApiKeyShow: React.FC = () => {
           />
         </Box>
         
-        <TextField 
-          label="API Key" 
-          value={record?.maskedKey || record?.key} 
-          multiline
-        />
+        <Box>
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+            API Key
+          </Typography>
+          <TextFieldComponent value={record?.maskedKey || record?.key} />
+        </Box>
         
         {record?.type === 'public' && (
           <>
-            <TextField 
-              label="Allowed Origins" 
-              value={record?.allowedOrigins?.join(', ') || 'All domains allowed'} 
-            />
+            <Box>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                Allowed Origins
+              </Typography>
+              <TextFieldComponent value={record?.allowedOrigins?.join(', ') || 'All domains allowed'} />
+            </Box>
             
-            <TextField 
-              label="Allowed Assistants" 
-              value={record?.allowedAssistants?.join(', ') || 'All Assistants allowed'} 
-            />
+            <Box>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                Allowed Assistants
+              </Typography>
+              <TextFieldComponent value={record?.allowedAssistants?.join(', ') || 'All Assistants allowed'} />
+            </Box>
             
             <Box>
               <Typography variant="subtitle1" sx={{ mb: 1 }}>
@@ -61,7 +66,12 @@ export const ApiKeyShow: React.FC = () => {
           </>
         )}
         
-        <TextField label="Created At" value={record?.createdAt} />
+        <Box>
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+            Created At
+          </Typography>
+          <TextFieldComponent value={record?.createdAt} />
+        </Box>
       </Stack>
     </Show>
   );

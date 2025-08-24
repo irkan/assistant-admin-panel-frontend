@@ -161,6 +161,7 @@ export const AssistantList: React.FC = () => {
   const [userPrompt, setUserPrompt] = useState("");
   const [selectedVoice, setSelectedVoice] = useState("zephyr");
   const [selectedAvatar, setSelectedAvatar] = useState("Ayla");
+  const [expandedAvatar, setExpandedAvatar] = useState<string | null>(null);
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
   const [silenceTimeout, setSilenceTimeout] = useState(30);
   const [maximumDuration, setMaximumDuration] = useState(600);
@@ -211,7 +212,7 @@ export const AssistantList: React.FC = () => {
       setMaximumDuration(selectedAgent.details?.maximumDuration ?? 600);
       
       // Set tools from agent data or empty array
-      setSelectedTools(selectedAgent.tools?.map(tool => tool.toolId) || []);
+      setSelectedTools(selectedAgent.tools?.map(tool => parseInt(tool.toolId)) || []);
       
       // Store original data for change detection
       setOriginalData({
@@ -1367,9 +1368,9 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
                     <Typography variant="subtitle2" gutterBottom>
                       Select Avatar
                     </Typography>
-                    <Grid container spacing={2} sx={{ mt: 1 }}>
+                    <Grid container spacing={2} sx={{ mt: 1, maxWidth: 400 }}>
                       {["Ayla", "Jessica", "Kevin", "Nina"].map((avatar) => (
-                        <Grid item xs={6} sm={3} key={avatar}>
+                        <Grid item xs={6} key={avatar}>
                           <Card
                             sx={{
                               cursor: "pointer",
@@ -1382,6 +1383,7 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
                               },
                             }}
                             onClick={() => setSelectedAvatar(avatar)}
+                            onDoubleClick={() => setExpandedAvatar(avatar)}
                           >
                             <CardContent sx={{ p: 2, textAlign: "center" }}>
                               <Box
@@ -1413,6 +1415,80 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
                   </Box>
                 </Stack>
               </TabPanel>
+
+              {/* Avatar Expanded View Dialog */}
+              <Dialog
+                open={expandedAvatar !== null}
+                onClose={() => setExpandedAvatar(null)}
+                maxWidth="sm"
+                fullWidth
+                sx={{
+                  "& .MuiDialog-paper": {
+                    backgroundColor: theme.palette.mode === "dark" 
+                      ? "rgba(0, 0, 0, 0.9)" 
+                      : "rgba(255, 255, 255, 0.95)",
+                    backdropFilter: "blur(10px)",
+                    WebkitBackdropFilter: "blur(10px)",
+                  },
+                }}
+                BackdropProps={{
+                  sx: {
+                    backgroundColor: "rgba(0, 0, 0, 0.7)",
+                  },
+                }}
+              >
+                <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <Typography variant="h6">Avatar Preview</Typography>
+                  <IconButton onClick={() => setExpandedAvatar(null)} size="small">
+                    <Close />
+                  </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ textAlign: "center", py: 4 }}>
+                  {expandedAvatar && (
+                    <Box>
+                      <Box
+                        component="img"
+                        src={`/assets/models/${expandedAvatar}.png`}
+                        alt={expandedAvatar}
+                        sx={{
+                          width: "100%",
+                          maxWidth: 300,
+                          height: "auto",
+                          objectFit: "contain",
+                          borderRadius: 2,
+                          mb: 2,
+                          boxShadow: 3,
+                        }}
+                      />
+                      <Typography variant="h5" fontWeight={600} gutterBottom>
+                        {expandedAvatar}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Click to select this avatar for your assistant
+                      </Typography>
+                    </Box>
+                  )}
+                </DialogContent>
+                <DialogActions sx={{ justifyContent: "center", pb: 3 }}>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      if (expandedAvatar) {
+                        setSelectedAvatar(expandedAvatar);
+                      }
+                      setExpandedAvatar(null);
+                    }}
+                  >
+                    Select This Avatar
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setExpandedAvatar(null)}
+                  >
+                    Close
+                  </Button>
+                </DialogActions>
+              </Dialog>
 
               <TabPanel value={tabValue} index={3}>
                 <Stack spacing={3}>

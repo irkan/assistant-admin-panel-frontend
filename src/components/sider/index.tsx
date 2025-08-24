@@ -36,11 +36,14 @@ import {
   Tooltip,
   Button,
   IconButton,
-  MuiMenuItem,
+  MenuItem,
   Typography,
   Divider,
 } from "@mui/material";
-import { RefineThemedLayoutV2SiderProps as SiderProps } from "@refinedev/mui";
+
+interface SiderProps extends RefineThemedLayoutV2SiderProps {
+  width?: number;
+}
 
 export const Sider: React.FC<SiderProps> = ({
   Title: TitleFromProps,

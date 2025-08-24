@@ -25,7 +25,7 @@ export const OrganizationModal: React.FC<OrganizationModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { mutate: createOrganization } = useCreate();
-  const { data: identity } = useGetIdentity();
+  const { data: identity } = useGetIdentity<{name?: string; email?: string}>();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

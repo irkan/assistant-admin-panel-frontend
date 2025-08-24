@@ -45,7 +45,6 @@ import {
   MoreVert,
   Build,
   Code,
-  Integration,
   Publish,
   Settings,
   Close,
@@ -175,7 +174,7 @@ export const ToolList = () => {
     }, {
       onSuccess: (data) => {
         refetch();
-        setSelectedTool(data.data);
+        setSelectedTool(data.data as Tool);
         setToolName(data.data.name);
         setToolDescription(data.data.description || "");
         setToolParameters(JSON.stringify(data.data.parameters || {}, null, 2));
