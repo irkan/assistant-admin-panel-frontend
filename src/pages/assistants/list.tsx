@@ -40,6 +40,7 @@ import {
   AppBar,
   Toolbar,
   Avatar,
+  Grid,
 } from "@mui/material";
 import {
   Add,
@@ -60,6 +61,8 @@ import {
   FileCopy,
   Close,
   SmartToy,
+  Person,
+  CheckCircle,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router";
 import dayjs from "dayjs";
@@ -93,6 +96,7 @@ interface Agent {
     temperature?: number;
     silenceTimeout?: number;
     maximumDuration?: number;
+    avatarName?: string;
   };
   tools?: Array<{
     id: number;
@@ -156,6 +160,7 @@ export const AssistantList: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState("gemini-2.0-flash-001");
   const [userPrompt, setUserPrompt] = useState("");
   const [selectedVoice, setSelectedVoice] = useState("zephyr");
+  const [selectedAvatar, setSelectedAvatar] = useState("Ayla");
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
   const [silenceTimeout, setSilenceTimeout] = useState(30);
   const [maximumDuration, setMaximumDuration] = useState(600);
@@ -197,6 +202,9 @@ export const AssistantList: React.FC = () => {
       // Set voice settings
       setSelectedVoice(selectedAgent.details?.selectedVoice || "zephyr");
       
+      // Set avatar
+      setSelectedAvatar(selectedAgent.details?.avatarName || "Ayla");
+      
       // Set advanced settings with proper defaults
       setTemperature(selectedAgent.details?.temperature ?? 0.7);
       setSilenceTimeout(selectedAgent.details?.silenceTimeout ?? 30);
@@ -213,6 +221,7 @@ export const AssistantList: React.FC = () => {
         provider: selectedAgent.details?.provider || "azure-openai",
         model: selectedAgent.details?.model || "gpt-4o-2024-11-20",
         selectedVoice: selectedAgent.details?.selectedVoice || "zephyr",
+        avatarName: selectedAgent.details?.avatarName || "Ayla",
         temperature: selectedAgent.details?.temperature ?? 0.7,
         silenceTimeout: selectedAgent.details?.silenceTimeout ?? 30,
         maximumDuration: selectedAgent.details?.maximumDuration ?? 600,
@@ -234,9 +243,10 @@ export const AssistantList: React.FC = () => {
       firstMessage,
       userPrompt,
       interactionMode,
-                provider: "google",
+      provider: "google",
       model: selectedModel,
       selectedVoice,
+      avatarName: selectedAvatar,
       temperature,
       silenceTimeout,
       maximumDuration,
@@ -252,7 +262,7 @@ export const AssistantList: React.FC = () => {
       const changesDetected = detectChanges();
       setHasChanges(changesDetected);
     }
-  }, [firstMessage, userPrompt, interactionMode, selectedProvider, selectedModel, selectedVoice, temperature, silenceTimeout, maximumDuration, selectedTools, originalData]);
+  }, [firstMessage, userPrompt, interactionMode, selectedProvider, selectedModel, selectedVoice, selectedAvatar, temperature, silenceTimeout, maximumDuration, selectedTools, originalData]);
 
   // Filter agents based on search
   const filteredAgents = agents.filter((agent) => {
@@ -290,6 +300,9 @@ export const AssistantList: React.FC = () => {
     
     // Set voice settings
     setSelectedVoice(agent.details?.selectedVoice || "zephyr");
+    
+    // Set avatar
+    setSelectedAvatar(agent.details?.avatarName || "Ayla");
     
     // Set advanced settings with proper defaults
     setTemperature(agent.details?.temperature ?? 0.7);
@@ -331,6 +344,7 @@ export const AssistantList: React.FC = () => {
         provider: "google",
         model: selectedModel,
         selectedVoice: selectedVoice,
+        avatarName: selectedAvatar,
         temperature: temperature,
         silenceTimeout: silenceTimeout,
         maximumDuration: maximumDuration,
@@ -1026,6 +1040,7 @@ export const AssistantList: React.FC = () => {
               <Tabs value={tabValue} onChange={handleTabChange}>
                 <Tab label="Model" sx={{ textTransform: "none" }} />
                 <Tab label="Voice" sx={{ textTransform: "none" }} />
+                <Tab label="Avatar" sx={{ textTransform: "none" }} />
                 <Tab label="Tools" sx={{ textTransform: "none" }} />
                 <Tab label="Advanced" sx={{ textTransform: "none" }} />
               </Tabs>
@@ -1334,6 +1349,72 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
               </TabPanel>
 
               <TabPanel value={tabValue} index={2}>
+                {/* Avatar Tab Content */}
+                <Stack spacing={3}>
+                  <Box>
+                    <Typography variant="h6" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Person sx={{ fontSize: 20 }} />
+                      Avatar
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Choose an avatar for your assistant.
+                    </Typography>
+                  </Box>
+
+                  <Divider />
+
+                  <Box>
+                    <Typography variant="subtitle2" gutterBottom>
+                      Select Avatar
+                    </Typography>
+                    <Grid container spacing={2} sx={{ mt: 1 }}>
+                      {["Ayla", "Jessica", "Kevin", "Nina"].map((avatar) => (
+                        <Grid item xs={6} sm={3} key={avatar}>
+                          <Card
+                            sx={{
+                              cursor: "pointer",
+                              border: selectedAvatar === avatar ? 2 : 1,
+                              borderColor: selectedAvatar === avatar ? "primary.main" : "divider",
+                              transition: "all 0.2s",
+                              "&:hover": {
+                                transform: "translateY(-2px)",
+                                boxShadow: 3,
+                              },
+                            }}
+                            onClick={() => setSelectedAvatar(avatar)}
+                          >
+                            <CardContent sx={{ p: 2, textAlign: "center" }}>
+                              <Box
+                                component="img"
+                                src={`/assets/models/${avatar}.png`}
+                                alt={avatar}
+                                sx={{
+                                  width: "100%",
+                                  height: 120,
+                                  objectFit: "contain",
+                                  borderRadius: 1,
+                                  mb: 1,
+                                }}
+                              />
+                              <Typography variant="subtitle2" fontWeight={600}>
+                                {avatar}
+                              </Typography>
+                              {selectedAvatar === avatar && (
+                                <CheckCircle
+                                  color="primary"
+                                  sx={{ fontSize: 20, mt: 1 }}
+                                />
+                              )}
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Box>
+                </Stack>
+              </TabPanel>
+
+              <TabPanel value={tabValue} index={3}>
                 <Stack spacing={3}>
                   <Box>
                     <Typography variant="h6" gutterBottom>
@@ -1491,7 +1572,7 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
                 </Stack>
               </TabPanel>
 
-              <TabPanel value={tabValue} index={3}>
+              <TabPanel value={tabValue} index={4}>
                 <Stack spacing={3}>
                   <Box>
                     <Typography variant="h6" gutterBottom>
