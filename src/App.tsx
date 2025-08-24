@@ -132,6 +132,8 @@ function App() {
                       name: "organizations",
                       show: "/organizations/show/:id",
                       edit: "/organizations/edit/:id",
+                      create: "/organizations/create",
+                      list: "/organizations",
                       meta: {
                         canDelete: false,
                         icon: <Business />,
