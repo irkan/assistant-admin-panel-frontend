@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useList, useCreate } from "@refinedev/core";
+import { useList, useCreate, useDelete } from "@refinedev/core";
 
 import {
   Box,
@@ -40,8 +40,6 @@ import {
   Close as CloseIcon,
   Key as KeyIcon,
   VpnKey,
-  Security,
-  Lock,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import "../../styles/modern-theme.css";
@@ -49,61 +47,49 @@ import "../../styles/modern-theme.css";
 interface ApiKey {
   id: string;
   name: string;
-  type: 'private' | 'public';
-  key: string;
-  maskedKey: string;
-  allowedOrigins?: string[];
-  allowedAssistants?: string[];
-  transientAssistants?: boolean;
+  maskedKey?: string;
+  keyPrefix?: string;
+  fullKey?: string; // For storing the full key when fetched
+  allowedAssistants?: number[];
+  expiresAt?: string;
+  isExpired?: boolean;
+  lastUsedAt?: string | null;
   createdAt: string;
-}
-
-interface Assistant {
-  id: string;
-  name: string;
+  active: boolean;
 }
 
 const CreateApiKeyModal: React.FC<{
   open: boolean;
   onClose: () => void;
-  type: 'private' | 'public';
-  onSuccess: () => void;
-}> = ({ open, onClose, type, onSuccess }) => {
+  onSuccess: (data?: any) => void;
+}> = ({ open, onClose, onSuccess }) => {
   const theme = useTheme();
   const [name, setName] = useState('');
-  const [allowedOrigins, setAllowedOrigins] = useState('');
-  const [selectedAssistants, setSelectedAssistants] = useState<string[]>([]);
-  const [transientAssistants, setTransientAssistants] = useState(true);
+  const [selectedAssistants, setSelectedAssistants] = useState<number[]>([]);
+  const [expiresInDays, setExpiresInDays] = useState(90);
   const { mutate: create, isLoading } = useCreate();
 
   // Get assistants from backend
-  const { data: assistantsData, isLoading: assistantsLoading } = useList<{id: number, name: string}>({
+  const { data: assistantsData } = useList<{id: number, name: string}>({
     resource: 'assistants',
-    pagination: { mode: 'off' },
+    pagination: { pageSize: 100 },
   });
 
-  const assistants: Assistant[] = assistantsData?.data?.map((assistant) => ({
-    id: assistant.id.toString(),
-    name: assistant.name,
-  })) || [];
+  const assistants = assistantsData?.data || [];
 
   const handleSubmit = () => {
     const data = {
       name,
-      type,
-      ...(type === 'public' && {
-        allowedOrigins: allowedOrigins.split(',').map(origin => origin.trim()),
-        allowedAssistants: selectedAssistants,
-        transientAssistants,
-      }),
+      allowedAssistants: selectedAssistants,
+      expiresInDays,
     };
 
     create({
       resource: 'api-keys',
       values: data,
     }, {
-      onSuccess: () => {
-        onSuccess();
+      onSuccess: (response) => {
+        onSuccess(response?.data);
         handleClose();
       },
     });
@@ -111,15 +97,14 @@ const CreateApiKeyModal: React.FC<{
 
   const handleClose = () => {
     setName('');
-    setAllowedOrigins('');
     setSelectedAssistants([]);
-    setTransientAssistants(true);
+    setExpiresInDays(90);
     onClose();
   };
 
   const handleAssistantChange = (event: any) => {
     const value = event.target.value;
-    setSelectedAssistants(typeof value === 'string' ? value.split(',') : value);
+    setSelectedAssistants(typeof value === 'string' ? value.split(',').map(Number) : value);
   };
 
   return (
@@ -158,7 +143,7 @@ const CreateApiKeyModal: React.FC<{
           pb: 2,
         }}>
           <Typography variant="h6">
-            New {type === 'private' ? 'Private' : 'Public'} API Key
+            Yeni API Key
           </Typography>
           <IconButton onClick={handleClose} size="small">
             <CloseIcon />
@@ -167,17 +152,17 @@ const CreateApiKeyModal: React.FC<{
         
         <DialogContent sx={{ mt: 2 }}>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Add a new API Key to restrict access
+            API key yaradın və assistantlarınıza giriş tənzimləyin
           </Typography>
           
           <Stack spacing={3}>
             <Box>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
-                Name
+                API Key Adı
               </Typography>
               <TextField
                 fullWidth
-                placeholder="API Key Name"
+                placeholder="Məsələn: Production API Key"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 variant="outlined"
@@ -188,107 +173,88 @@ const CreateApiKeyModal: React.FC<{
                   },
                 }}
               />
-              <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
-                Token Name is a required field
+              {!name.trim() && (
+                <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
+                  API key adı tələb olunur
+                </Typography>
+              )}
+            </Box>
+
+            <Box>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                Bitme müddəti (gün)
+              </Typography>
+              <TextField
+                fullWidth
+                type="number"
+                placeholder="90"
+                value={expiresInDays}
+                onChange={(e) => setExpiresInDays(Number(e.target.value))}
+                variant="outlined"
+                inputProps={{ min: 1, max: 365 }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f8f9fa',
+                    borderRadius: 1,
+                  },
+                }}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+                1-365 gün arasında ola bilər (default: 90 gün)
               </Typography>
             </Box>
 
-            {type === 'public' && (
-              <>
-                <Box>
-                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 500, display: 'flex', alignItems: 'center' }}>
-                    Allowed Origins 
-                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                      ℹ️
-                    </Typography>
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    placeholder="Allowed urls"
-                    value={allowedOrigins}
-                    onChange={(e) => setAllowedOrigins(e.target.value)}
-                    variant="outlined"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f8f9fa',
-                        borderRadius: 1,
-                      },
-                    }}
-                  />
-                </Box>
-
-                <Box>
-                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 500, display: 'flex', alignItems: 'center' }}>
-                    Allowed Assistants 
-                    <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                      ℹ️
-                    </Typography>
-                  </Typography>
-                  <FormControl fullWidth>
-                    <Select
-                      multiple
-                      value={selectedAssistants}
-                      onChange={handleAssistantChange}
-                      input={<OutlinedInput />}
-                      renderValue={(selected) => (
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                          {selected.map((value) => {
-                            const assistant = assistants.find(a => a.id === value);
-                            return (
-                              <Chip key={value} label={assistant?.name} size="small" />
-                            );
-                          })}
-                        </Box>
-                      )}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f8f9fa',
-                          borderRadius: 1,
-                        },
-                      }}
-                      displayEmpty
-                    >
-                      <MenuItem disabled value="">
-                        Select Assistants
-                      </MenuItem>
-                      {assistants.map((assistant) => (
-                        <MenuItem key={assistant.id} value={assistant.id}>
-                          <Checkbox checked={selectedAssistants.indexOf(assistant.id) > -1} />
-                          <ListItemText primary={assistant.name} />
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Box>
-
-                <Box>
-                  <FormControlLabel
-                    control={
-                      <Switch 
-                        checked={transientAssistants} 
-                        onChange={(e) => setTransientAssistants(e.target.checked)}
-                        sx={{
-                          '& .MuiSwitch-switchBase.Mui-checked': {
-                            color: '#10b981',
-                          },
-                          '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                            backgroundColor: '#10b981',
-                          },
-                        }}
-                      />
-                    }
-                    label={
-                      <Typography variant="body2" sx={{ fontWeight: 500, display: 'flex', alignItems: 'center' }}>
-                        Transient Assistant 
-                        <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                          ℹ️
+            <Box>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                İcazə verilən Assistantlar
+              </Typography>
+              <FormControl fullWidth>
+                <Select
+                  multiple
+                  value={selectedAssistants}
+                  onChange={handleAssistantChange}
+                  input={<OutlinedInput />}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.length === 0 ? (
+                        <Typography variant="body2" color="text.secondary">
+                          Bütün assistantlara icazə verilir
                         </Typography>
-                      </Typography>
-                    }
-                  />
-                </Box>
-              </>
-            )}
+                      ) : (
+                        selected.map((value) => {
+                          const assistant = assistants.find(a => a.id === value);
+                          return (
+                            <Chip key={value} label={assistant?.name || `Assistant ${value}`} size="small" />
+                          );
+                        })
+                      )}
+                    </Box>
+                  )}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: theme.palette.mode === 'dark' ? '#2a2a2a' : '#f8f9fa',
+                      borderRadius: 1,
+                    },
+                  }}
+                  displayEmpty
+                >
+                  <MenuItem value="" disabled>
+                    <Typography color="text.secondary">
+                      Assistantları seçin (boş buraxsanız hamısına icazə verilir)
+                    </Typography>
+                  </MenuItem>
+                  {assistants.map((assistant) => (
+                    <MenuItem key={assistant.id} value={assistant.id}>
+                      <Checkbox checked={selectedAssistants.indexOf(assistant.id) > -1} />
+                      <ListItemText primary={assistant.name} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                Heç bir assistant seçilməzsə, bütün assistantlara icazə verilir
+              </Typography>
+            </Box>
           </Stack>
 
           <Button
@@ -307,7 +273,7 @@ const CreateApiKeyModal: React.FC<{
               fontWeight: 600,
             }}
           >
-            Create {type === 'private' ? 'Private' : 'Public'} Token
+            API Key Yarat
           </Button>
         </DialogContent>
       </Dialog>
@@ -318,15 +284,28 @@ const CreateApiKeyModal: React.FC<{
 const ApiKeyCard: React.FC<{
   apiKey: ApiKey;
   onCopy: (key: string) => void;
-  onView: () => void;
-  onDelete: () => void;
-}> = ({ apiKey, onCopy, onView, onDelete }) => {
+  onView: (apiKey: ApiKey) => void;
+  onDelete: (apiKey: ApiKey) => void;
+  fullKey?: string;
+}> = ({ apiKey, onCopy, onView, onDelete, fullKey }) => {
   const theme = useTheme();
   const [isVisible, setIsVisible] = useState(false);
 
   const handleToggleVisibility = () => {
+    if (!isVisible && !fullKey) {
+      // Fetch the full key when showing for the first time
+      onView(apiKey);
+    }
     setIsVisible(!isVisible);
   };
+
+  // Use fullKey if available and visible, otherwise show masked version
+  const displayKey = isVisible && fullKey 
+    ? fullKey 
+    : (apiKey.keyPrefix ? `${apiKey.keyPrefix}••••••••••••••••••••••••••••••••` : 'ak_••••••••••••••••••••••••••••••••');
+
+  // For copying, use fullKey if available, otherwise use maskedKey
+  const keyToCopy = fullKey || apiKey.maskedKey || '';
 
   return (
     <Card 
@@ -342,7 +321,7 @@ const ApiKeyCard: React.FC<{
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box sx={{ flex: 1 }}>
             <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-              {apiKey.type === 'private' ? 'Private Key' : 'Public Key'}
+              {apiKey.name}
             </Typography>
             
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -356,44 +335,62 @@ const ApiKeyCard: React.FC<{
                   flex: 1,
                 }}
               >
-                {isVisible ? apiKey.key : apiKey.maskedKey}
+                {displayKey}
               </Typography>
             </Box>
 
-            {apiKey.type === 'public' && (
-              <Stack spacing={1}>
+            <Stack spacing={1}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
+                  Status:
+                </Typography>
+                <Chip 
+                  label={apiKey.active ? 'Aktiv' : 'Deaktiv'} 
+                  color={apiKey.active ? 'success' : 'error'} 
+                  size="small" 
+                />
+              </Box>
+              
+              {apiKey.allowedAssistants && apiKey.allowedAssistants.length > 0 && (
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
-                    Origins:
+                    Assistantlar:
                   </Typography>
                   <Typography variant="body2">
-                    All domains allowed
+                    {apiKey.allowedAssistants.length} assistant seçili
                   </Typography>
                 </Box>
+              )}
+              
+              {apiKey.expiresAt && (
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
-                    Assistants:
+                    Bitmə tarixi:
                   </Typography>
-                  <Typography variant="body2">
-                    All Assistants allowed
+                  <Typography variant="body2" color={apiKey.isExpired ? 'error.main' : 'text.primary'}>
+                    {new Date(apiKey.expiresAt).toLocaleDateString('az-AZ')}
+                    {apiKey.isExpired && ' (Vaxtı bitib)'}
                   </Typography>
                 </Box>
+              )}
+              
+              {apiKey.lastUsedAt && (
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                   <Typography variant="body2" color="text.secondary" sx={{ minWidth: 120 }}>
-                    Transient Assistants:
+                    Son istifadə:
                   </Typography>
                   <Typography variant="body2">
-                    Allowed
+                    {new Date(apiKey.lastUsedAt).toLocaleDateString('az-AZ')}
                   </Typography>
                 </Box>
-              </Stack>
-            )}
+              )}
+            </Stack>
           </Box>
 
           <Stack direction="row" spacing={1}>
             <IconButton 
               size="small" 
-              onClick={() => onCopy(apiKey.key)}
+              onClick={() => onCopy(keyToCopy)}
               sx={{ 
                 color: 'text.secondary',
                 '&:hover': { color: 'primary.main' },
@@ -413,7 +410,7 @@ const ApiKeyCard: React.FC<{
             </IconButton>
             <IconButton 
               size="small" 
-              onClick={onDelete}
+              onClick={() => onDelete(apiKey)}
               sx={{ 
                 color: 'text.secondary',
                 '&:hover': { color: 'error.main' },
@@ -431,68 +428,89 @@ const ApiKeyCard: React.FC<{
 export const ApiKeyList: React.FC = () => {
   const theme = useTheme();
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<'private' | 'public'>('private');
+  const [fullKeys, setFullKeys] = useState<Record<string, string>>({});
+  const [newlyCreatedKey, setNewlyCreatedKey] = useState<{id: string, rawKey: string} | null>(null);
   
-  // Mock API keys data
-  const mockApiKeys: ApiKey[] = [
-    {
-      id: '1',
-      name: 'Private Key 1',
-      type: 'private',
-      key: '61f03502-9f16-44e1-b3fa-c1a7689cbd89',
-      maskedKey: '••••••••••••••••••••••••••••••••',
-      createdAt: '2024-01-15',
-    },
-    {
-      id: '2',
-      name: 'Public Key 1',
-      type: 'public',
-      key: 'pk_live_1234567890abcdef1234567890abcdef',
-      maskedKey: '••••••••••••••••••••••••••••••••',
-      allowedOrigins: ['*'],
-      allowedAssistants: ['*'],
-      transientAssistants: true,
-      createdAt: '2024-01-15',
-    },
-  ];
-
   const { data, refetch } = useList<ApiKey>({
     resource: 'api-keys',
     pagination: { mode: 'off' },
   });
 
-  // Use mock data if no real data
-  const apiKeys: ApiKey[] = data?.data?.length ? data.data : mockApiKeys;
+  const { mutate: deleteApiKey } = useDelete();
 
-  const privateKeys: ApiKey[] = apiKeys.filter(key => key.type === 'private');
-  const publicKeys: ApiKey[] = apiKeys.filter(key => key.type === 'public');
+  const apiKeys: ApiKey[] = data?.data || [];
 
-  const handleCreateClick = (type: 'private' | 'public') => {
-    setModalType(type);
+  const handleCreateClick = () => {
     setModalOpen(true);
   };
 
   const handleModalClose = () => {
     setModalOpen(false);
+    // Clear newly created key after some time to allow user to copy it
+    setTimeout(() => {
+      setNewlyCreatedKey(null);
+    }, 30000); // Clear after 30 seconds
   };
 
-  const handleCreateSuccess = () => {
+  const handleCreateSuccess = (data?: any) => {
     refetch();
+    // Store the raw key if it's provided in the response
+    if (data?.rawKey && data?.id) {
+      setNewlyCreatedKey({ id: data.id.toString(), rawKey: data.rawKey });
+      setFullKeys(prev => ({ ...prev, [data.id.toString()]: data.rawKey }));
+    }
   };
 
-  const handleCopy = (key: string) => {
-    navigator.clipboard.writeText(key);
-    // You can add a toast notification here
+  const handleCopy = async (key: string) => {
+    try {
+      await navigator.clipboard.writeText(key);
+      // TODO: Add toast notification here
+      console.log('API key copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy API key:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = key;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+    }
   };
 
-  const handleView = (apiKey: ApiKey) => {
-    // Show full key logic
-    console.log('View key:', apiKey);
+  const handleView = async (apiKey: ApiKey) => {
+    // If we have the full key (from recent creation), use it
+    if (newlyCreatedKey?.id === apiKey.id) {
+      return; // Key is already stored
+    }
+    
+    // Otherwise, show the maskedKey as the best available option
+    if (!fullKeys[apiKey.id] && apiKey.maskedKey) {
+      setFullKeys(prev => ({ ...prev, [apiKey.id]: apiKey.maskedKey || '' }));
+    }
   };
 
   const handleDelete = (apiKey: ApiKey) => {
-    // Delete key logic
-    console.log('Delete key:', apiKey);
+    if (window.confirm(`"${apiKey.name}" API key-ini silmək istədiyinizə əminsiniz?`)) {
+      deleteApiKey({
+        resource: 'api-keys',
+        id: apiKey.id,
+      }, {
+        onSuccess: () => {
+          refetch();
+          // Remove from fullKeys state if it exists
+          setFullKeys(prev => {
+            const updated = { ...prev };
+            delete updated[apiKey.id];
+            return updated;
+          });
+          console.log('API key deleted successfully');
+        },
+        onError: (error) => {
+          console.error('Failed to delete API key:', error);
+        }
+      });
+    }
   };
 
   return (
@@ -550,179 +568,96 @@ export const ApiKeyList: React.FC = () => {
         </Fade>
 
         <Grid container spacing={4}>
-        {/* Private API Keys Section */}
-        <Grid item xs={12}>
-          <Fade in timeout={800}>
-            <Paper
-              className="modern-card-dark"
-              sx={{ p: 4, mb: 2 }}
-            >
-              <Box sx={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center',
-                mb: 3,
-              }}>
-                <Box>
-                  <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
-                    <Avatar
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                      }}
-                    >
-                      <Lock sx={{ fontSize: 18 }} />
-                    </Avatar>
-                    <Typography variant="h5" sx={{ fontWeight: 700, color: "white" }}>
-                      Private API Keys
+          {/* API Keys Section */}
+          <Grid item xs={12}>
+            <Fade in timeout={800}>
+              <Paper
+                className="modern-card-dark"
+                sx={{ p: 4 }}
+              >
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  mb: 3,
+                }}>
+                  <Box>
+                    <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+                      <Avatar
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                        }}
+                      >
+                        <VpnKey sx={{ fontSize: 18 }} />
+                      </Avatar>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: "white" }}>
+                        API Keys
+                      </Typography>
+                    </Stack>
+                    <Typography variant="body2" sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+                      API key-lərinizi idarə edin və assistantlarınıza təhlükəsiz giriş təmin edin.
                     </Typography>
-                  </Stack>
-                  <Typography variant="body2" sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
-                    Use these keys for interacting with our APIs in your backend systems.
-                  </Typography>
+                  </Box>
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={handleCreateClick}
+                    sx={{
+                      background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                      textTransform: "none",
+                      borderRadius: "12px",
+                      fontWeight: 600,
+                      px: 3,
+                      py: 1.5,
+                      boxShadow: "0 4px 16px rgba(16, 185, 129, 0.3)",
+                      "&:hover": {
+                        background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                        transform: "translateY(-2px)",
+                        boxShadow: "0 8px 24px rgba(16, 185, 129, 0.4)",
+                      },
+                    }}
+                  >
+                    Yeni Key
+                  </Button>
                 </Box>
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  onClick={() => handleCreateClick('private')}
-                  sx={{
-                    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                    textTransform: "none",
-                    borderRadius: "12px",
-                    fontWeight: 600,
-                    px: 3,
-                    py: 1.5,
-                    boxShadow: "0 4px 16px rgba(16, 185, 129, 0.3)",
-                    "&:hover": {
-                      background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
-                      transform: "translateY(-2px)",
-                      boxShadow: "0 8px 24px rgba(16, 185, 129, 0.4)",
-                    },
-                  }}
-                >
-                  Add Key
-                </Button>
-              </Box>
-          
-          <Box>
-            {privateKeys.map((apiKey) => (
-              <ApiKeyCard
-                key={apiKey.id}
-                apiKey={apiKey}
-                onCopy={handleCopy}
-                onView={() => handleView(apiKey)}
-                onDelete={() => handleDelete(apiKey)}
-              />
-            ))}
-            {privateKeys.length === 0 && (
-              <Card sx={{ 
-                border: '2px dashed rgba(255, 255, 255, 0.2)',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                textAlign: 'center',
-                py: 4,
-                borderRadius: 2,
-              }}>
-                <Typography sx={{ color: "rgba(255, 255, 255, 0.6)" }}>
-                  No private API keys yet
-                </Typography>
-              </Card>
-            )}
-          </Box>
-            </Paper>
-          </Fade>
+            
+                <Box>
+                  {apiKeys.map((apiKey) => (
+                    <ApiKeyCard
+                      key={apiKey.id}
+                      apiKey={apiKey}
+                      onCopy={handleCopy}
+                      onView={handleView}
+                      onDelete={handleDelete}
+                      fullKey={fullKeys[apiKey.id]}
+                    />
+                  ))}
+                  {apiKeys.length === 0 && (
+                    <Card sx={{ 
+                      border: '2px dashed rgba(255, 255, 255, 0.2)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      textAlign: 'center',
+                      py: 4,
+                      borderRadius: 2,
+                    }}>
+                      <Typography sx={{ color: "rgba(255, 255, 255, 0.6)" }}>
+                        Heç bir API key yoxdur. Yeni key yaradın.
+                      </Typography>
+                    </Card>
+                  )}
+                </Box>
+              </Paper>
+            </Fade>
+          </Grid>
         </Grid>
 
-        {/* Public API Keys Section */}
-        <Grid item xs={12}>
-          <Fade in timeout={1000}>
-            <Paper
-              className="modern-card-dark"
-              sx={{ p: 4 }}
-            >
-              <Box sx={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center',
-                mb: 3,
-              }}>
-                <Box>
-                  <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
-                    <Avatar
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-                      }}
-                    >
-                      <Security sx={{ fontSize: 18 }} />
-                    </Avatar>
-                    <Typography variant="h5" sx={{ fontWeight: 700, color: "white" }}>
-                      Public API Keys
-                    </Typography>
-                  </Stack>
-                  <Typography variant="body2" sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
-                    Use these keys for interacting with our APIs in your frontend applications.
-                  </Typography>
-                </Box>
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  onClick={() => handleCreateClick('public')}
-                  sx={{
-                    background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-                    textTransform: "none",
-                    borderRadius: "12px",
-                    fontWeight: 600,
-                    px: 3,
-                    py: 1.5,
-                    boxShadow: "0 4px 16px rgba(59, 130, 246, 0.3)",
-                    "&:hover": {
-                      background: "linear-gradient(135deg, #2563eb 0%, #1e40af 100%)",
-                      transform: "translateY(-2px)",
-                      boxShadow: "0 8px 24px rgba(59, 130, 246, 0.4)",
-                    },
-                  }}
-                >
-                  Add Key
-                </Button>
-              </Box>
-              
-              <Box>
-            {publicKeys.map((apiKey) => (
-              <ApiKeyCard
-                key={apiKey.id}
-                apiKey={apiKey}
-                onCopy={handleCopy}
-                onView={() => handleView(apiKey)}
-                onDelete={() => handleDelete(apiKey)}
-              />
-            ))}
-            {publicKeys.length === 0 && (
-              <Card sx={{ 
-                border: '2px dashed rgba(255, 255, 255, 0.2)',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                textAlign: 'center',
-                py: 4,
-                borderRadius: 2,
-              }}>
-                <Typography sx={{ color: "rgba(255, 255, 255, 0.6)" }}>
-                  No public API keys yet
-                </Typography>
-              </Card>
-            )}
-          </Box>
-            </Paper>
-          </Fade>
-        </Grid>
-      </Grid>
-
-      <CreateApiKeyModal
-        open={modalOpen}
-        onClose={handleModalClose}
-        type={modalType}
-        onSuccess={handleCreateSuccess}
-      />
+        <CreateApiKeyModal
+          open={modalOpen}
+          onClose={handleModalClose}
+          onSuccess={handleCreateSuccess}
+        />
       </Container>
     </Box>
   );
