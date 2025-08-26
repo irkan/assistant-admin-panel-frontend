@@ -287,7 +287,8 @@ const ApiKeyCard: React.FC<{
   onView: (apiKey: ApiKey) => void;
   onDelete: (apiKey: ApiKey) => void;
   fullKey?: string;
-}> = ({ apiKey, onCopy, onView, onDelete, fullKey }) => {
+  isLoading?: boolean;
+}> = ({ apiKey, onCopy, onView, onDelete, fullKey, isLoading = false }) => {
   const theme = useTheme();
   const [isVisible, setIsVisible] = useState(false);
 
@@ -335,7 +336,7 @@ const ApiKeyCard: React.FC<{
                   flex: 1,
                 }}
               >
-                {displayKey}
+                {isLoading && isVisible ? 'Yüklənir...' : displayKey}
               </Typography>
             </Box>
 
@@ -430,6 +431,7 @@ export const ApiKeyList: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [fullKeys, setFullKeys] = useState<Record<string, string>>({});
   const [newlyCreatedKey, setNewlyCreatedKey] = useState<{id: string, rawKey: string} | null>(null);
+  const [loadingKeys, setLoadingKeys] = useState<Record<string, boolean>>({});
   
   const { data, refetch } = useList<ApiKey>({
     resource: 'api-keys',
@@ -479,14 +481,49 @@ export const ApiKeyList: React.FC = () => {
   };
 
   const handleView = async (apiKey: ApiKey) => {
-    // If we have the full key (from recent creation), use it
-    if (newlyCreatedKey?.id === apiKey.id) {
-      return; // Key is already stored
+    // If we already have the full key, don't fetch again
+    if (fullKeys[apiKey.id]) {
+      return;
     }
     
-    // Otherwise, show the maskedKey as the best available option
-    if (!fullKeys[apiKey.id] && apiKey.maskedKey) {
-      setFullKeys(prev => ({ ...prev, [apiKey.id]: apiKey.maskedKey || '' }));
+    // Set loading state
+    setLoadingKeys(prev => ({ ...prev, [apiKey.id]: true }));
+    
+    try {
+      // Fetch the full key from backend
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3003'}/api/api-keys/${apiKey.id}/full`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('refine-auth')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data.fullKey) {
+          setFullKeys(prev => ({ ...prev, [apiKey.id]: data.data.fullKey }));
+        } else {
+          // Fallback to maskedKey if no fullKey in response
+          if (apiKey.maskedKey) {
+            setFullKeys(prev => ({ ...prev, [apiKey.id]: apiKey.maskedKey || '' }));
+          }
+        }
+      } else {
+        console.error('Failed to fetch full API key:', response.statusText);
+        // Fallback to maskedKey if fetch fails
+        if (apiKey.maskedKey) {
+          setFullKeys(prev => ({ ...prev, [apiKey.id]: apiKey.maskedKey || '' }));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching full API key:', error);
+      // Fallback to maskedKey on error
+      if (apiKey.maskedKey) {
+        setFullKeys(prev => ({ ...prev, [apiKey.id]: apiKey.maskedKey || '' }));
+      }
+    } finally {
+      // Clear loading state
+      setLoadingKeys(prev => ({ ...prev, [apiKey.id]: false }));
     }
   };
 
@@ -498,8 +535,13 @@ export const ApiKeyList: React.FC = () => {
       }, {
         onSuccess: () => {
           refetch();
-          // Remove from fullKeys state if it exists
+          // Remove from both fullKeys and loadingKeys state if they exist
           setFullKeys(prev => {
+            const updated = { ...prev };
+            delete updated[apiKey.id];
+            return updated;
+          });
+          setLoadingKeys(prev => {
             const updated = { ...prev };
             delete updated[apiKey.id];
             return updated;
@@ -632,6 +674,7 @@ export const ApiKeyList: React.FC = () => {
                       onView={handleView}
                       onDelete={handleDelete}
                       fullKey={fullKeys[apiKey.id]}
+                      isLoading={loadingKeys[apiKey.id] || false}
                     />
                   ))}
                   {apiKeys.length === 0 && (
