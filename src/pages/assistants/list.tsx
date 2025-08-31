@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { List } from "@refinedev/mui";
 import { useList, useUpdate, useDelete } from "@refinedev/core";
-import { CreateAssistantModal } from "../../components";
+import { CreateAssistantModal, AvatarTab } from "../../components";
 import toolTypesData from "../../data/toolTypes.json";
 import {
   Box,
@@ -161,7 +161,6 @@ export const AssistantList: React.FC = () => {
   const [userPrompt, setUserPrompt] = useState("");
   const [selectedVoice, setSelectedVoice] = useState("zephyr");
   const [selectedAvatar, setSelectedAvatar] = useState("Ayla");
-  const [expandedAvatar, setExpandedAvatar] = useState<string | null>(null);
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
   const [silenceTimeout, setSilenceTimeout] = useState(30);
   const [maximumDuration, setMaximumDuration] = useState(600);
@@ -1350,145 +1349,24 @@ Siz Aylasınız, Azərbaycan Beynəlxalq Bankının ray toplayan səsli assisten
               </TabPanel>
 
               <TabPanel value={tabValue} index={2}>
-                {/* Avatar Tab Content */}
-                <Stack spacing={3}>
-                  <Box>
-                    <Typography variant="h6" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Person sx={{ fontSize: 20 }} />
-                      Avatar
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Choose an avatar for your assistant.
+                {/* Avatar Tab with Avatar Selection and Gemini Image Generation */}
+                {selectedAgent && (
+                  <AvatarTab 
+                    assistantId={selectedAgent.id} 
+                    assistantName={selectedAgent.name}
+                    selectedAvatar={selectedAvatar}
+                    onAvatarChange={setSelectedAvatar}
+                  />
+                )}
+                {!selectedAgent && (
+                  <Box sx={{ textAlign: 'center', p: 4 }}>
+                    <Typography variant="body1" color="text.secondary">
+                      Please select an assistant to manage avatar and backgrounds.
                     </Typography>
                   </Box>
-
-                  <Divider />
-
-                  <Box>
-                    <Typography variant="subtitle2" gutterBottom>
-                      Select Avatar
-                    </Typography>
-                    <Grid container spacing={2} sx={{ mt: 1, maxWidth: 400 }}>
-                      {["Ayla", "Jessica", "Kevin", "Nina"].map((avatar) => (
-                        <Grid item xs={6} key={avatar}>
-                          <Card
-                            sx={{
-                              cursor: "pointer",
-                              border: selectedAvatar === avatar ? 2 : 1,
-                              borderColor: selectedAvatar === avatar ? "primary.main" : "divider",
-                              transition: "all 0.2s",
-                              "&:hover": {
-                                transform: "translateY(-2px)",
-                                boxShadow: 3,
-                              },
-                            }}
-                            onClick={() => setSelectedAvatar(avatar)}
-                            onDoubleClick={() => setExpandedAvatar(avatar)}
-                          >
-                            <CardContent sx={{ p: 2, textAlign: "center" }}>
-                              <Box
-                                component="img"
-                                src={`/assets/models/${avatar}.png`}
-                                alt={avatar}
-                                sx={{
-                                  width: "100%",
-                                  height: 120,
-                                  objectFit: "contain",
-                                  borderRadius: 1,
-                                  mb: 1,
-                                }}
-                              />
-                              <Typography variant="subtitle2" fontWeight={600}>
-                                {avatar}
-                              </Typography>
-                              {selectedAvatar === avatar && (
-                                <CheckCircle
-                                  color="primary"
-                                  sx={{ fontSize: 20, mt: 1 }}
-                                />
-                              )}
-                            </CardContent>
-                          </Card>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Box>
-                </Stack>
+                )}
               </TabPanel>
 
-              {/* Avatar Expanded View Dialog */}
-              <Dialog
-                open={expandedAvatar !== null}
-                onClose={() => setExpandedAvatar(null)}
-                maxWidth="sm"
-                fullWidth
-                sx={{
-                  "& .MuiDialog-paper": {
-                    backgroundColor: theme.palette.mode === "dark" 
-                      ? "rgba(0, 0, 0, 0.9)" 
-                      : "rgba(255, 255, 255, 0.95)",
-                    backdropFilter: "blur(10px)",
-                    WebkitBackdropFilter: "blur(10px)",
-                  },
-                }}
-                BackdropProps={{
-                  sx: {
-                    backgroundColor: "rgba(0, 0, 0, 0.7)",
-                  },
-                }}
-              >
-                <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <Typography variant="h6">Avatar Preview</Typography>
-                  <IconButton onClick={() => setExpandedAvatar(null)} size="small">
-                    <Close />
-                  </IconButton>
-                </DialogTitle>
-                <DialogContent sx={{ textAlign: "center", py: 4 }}>
-                  {expandedAvatar && (
-                    <Box>
-                      <Box
-                        component="img"
-                        src={`/assets/models/${expandedAvatar}.png`}
-                        alt={expandedAvatar}
-                        sx={{
-                          width: "100%",
-                          maxWidth: 300,
-                          height: "auto",
-                          objectFit: "contain",
-                          borderRadius: 2,
-                          mb: 2,
-                          boxShadow: 3,
-                        }}
-                      />
-                      <Typography variant="h5" fontWeight={600} gutterBottom>
-                        {expandedAvatar}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Click to select this avatar for your assistant
-                      </Typography>
-                    </Box>
-                  )}
-                </DialogContent>
-                <DialogActions sx={{ justifyContent: "center", pb: 3 }}>
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      if (expandedAvatar) {
-                        setSelectedAvatar(expandedAvatar);
-                      }
-                      setExpandedAvatar(null);
-                    }}
-                  >
-                    Select This Avatar
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={() => setExpandedAvatar(null)}
-                  >
-                    Close
-                  </Button>
-                </DialogActions>
-              </Dialog>
 
               <TabPanel value={tabValue} index={3}>
                 <Stack spacing={3}>
