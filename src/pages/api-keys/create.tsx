@@ -16,6 +16,12 @@ import {
   Alert,
 } from "@mui/material";
 
+interface ApiKeyFormData {
+  name: string;
+  allowedAssistants: number[];
+  expiresInDays: number;
+}
+
 export const ApiKeyCreate: React.FC = () => {
   const {
     saveButtonProps,
@@ -24,10 +30,10 @@ export const ApiKeyCreate: React.FC = () => {
     formState: { errors },
     watch,
     setValue,
-  } = useForm({
+  } = useForm<ApiKeyFormData>({
     defaultValues: {
       name: "",
-      allowedAssistants: [],
+      allowedAssistants: [] as number[],
       expiresInDays: 90,
     },
   });
@@ -45,7 +51,7 @@ export const ApiKeyCreate: React.FC = () => {
 
   // Update form value when selected assistants change
   useEffect(() => {
-    setValue("allowedAssistants", selectedAssistants);
+    setValue("allowedAssistants", selectedAssistants as number[]);
   }, [selectedAssistants, setValue]);
 
   const handleAssistantChange = (event: any) => {
@@ -62,12 +68,12 @@ export const ApiKeyCreate: React.FC = () => {
       >
         <Stack spacing={3}>
           <Alert severity="info">
-            API anahtarı yaradıldıqdan sonra yalnız bir dəfə göstəriləcək. Onu təhlükəsiz yerdə saxlayın.
+            The API key will only be shown once after creation. Store it in a safe place.
           </Alert>
 
           <TextField
             {...register("name", {
-              required: "Bu sahə tələb olunur",
+              required: "This field is required",
             })}
             error={!!(errors as any)?.name}
             helperText={(errors as any)?.name?.message}
@@ -75,43 +81,43 @@ export const ApiKeyCreate: React.FC = () => {
             fullWidth
             InputLabelProps={{ shrink: true }}
             type="text"
-            label="API Key Adı"
+            label="API Key Name"
             name="name"
-            placeholder="Məsələn: Production API Key"
+            placeholder="Example: Production API Key"
           />
 
           <TextField
             {...register("expiresInDays", {
-              required: "Bu sahə tələb olunur",
-              min: { value: 1, message: "Minimum 1 gün olmalıdır" },
-              max: { value: 365, message: "Maksimum 365 gün ola bilər" },
+              required: "This field is required",
+              min: { value: 1, message: "Minimum 1 day required" },
+              max: { value: 365, message: "Maximum 365 days allowed" },
             })}
             error={!!(errors as any)?.expiresInDays}
             helperText={
               (errors as any)?.expiresInDays?.message ||
-              `API key ${watchExpiresInDays} gün sonra expire olacaq`
+              `API key will expire in ${watchExpiresInDays} days`
             }
             margin="normal"
             fullWidth
             InputLabelProps={{ shrink: true }}
             type="number"
-            label="Bitme müddəti (gün)"
+            label="Expiration period (days)"
             name="expiresInDays"
             defaultValue={90}
           />
 
           <FormControl fullWidth>
-            <InputLabel>İcazə verilən Assistantlar</InputLabel>
+            <InputLabel>Allowed Assistants</InputLabel>
             <Select
               multiple
               value={selectedAssistants}
               onChange={handleAssistantChange}
-              input={<OutlinedInput label="İcazə verilən Assistantlar" />}
+              input={<OutlinedInput label="Allowed Assistants" />}
               renderValue={(selected) => (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {selected.length === 0 ? (
                     <Typography variant="body2" color="text.secondary">
-                      Bütün assistantlara icazə verilir
+                      All assistants are allowed
                     </Typography>
                   ) : (
                     selected.map((value) => {
@@ -130,7 +136,7 @@ export const ApiKeyCreate: React.FC = () => {
             >
               <MenuItem value="">
                 <Typography color="text.secondary">
-                  Bütün assistantlara icazə ver
+                  Allow all assistants
                 </Typography>
               </MenuItem>
               {assistants.map((assistant) => (
@@ -140,7 +146,7 @@ export const ApiKeyCreate: React.FC = () => {
               ))}
             </Select>
             <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-              Heç bir assistant seçilməzsə, bütün assistantlara icazə verilir
+              If no assistants are selected, all assistants will be allowed
             </Typography>
           </FormControl>
         </Stack>
